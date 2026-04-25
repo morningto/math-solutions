@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第20题 - 证明BC=BD（全等三角形）</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e1a;
+    color: #c9d1d9;
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a1040 0%, #0d2137 50%, #0a1628 100%);
+    border-bottom: 2px solid #2d4a7a;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .header .badge {
+    background: linear-gradient(135deg, #6c5ce7, #a855f7);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .header h1 {
+    font-size: 22px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    margin-left: auto;
+    color: #8892a8;
+    font-size: 14px;
+  }
+
+  /* Main layout */
+  .main-container {
+    display: flex;
+    height: calc(100vh - 72px);
+  }
+
+  /* Left panel - canvas */
+  .canvas-panel {
+    flex: 1;
+    min-width: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #1e2d4a;
+    background: #0c1220;
+  }
+  .canvas-title {
+    font-size: 14px;
+    color: #6b7b9a;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+  .canvas-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #111b2e 0%, #0a0f1c 70%);
+    border-radius: 12px;
+    border: 1px solid #1a2540;
+    position: relative;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+  }
+
+  /* Right panel - proof */
+  .proof-panel {
+    width: 460px;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    background: #0d1220;
+  }
+
+  /* Problem statement */
+  .problem-box {
+    margin: 16px 16px 0;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #1a1535 0%, #141e35 100%);
+    border: 1px solid #2d2460;
+    border-radius: 10px;
+  }
+  .problem-box .label {
+    font-size: 11px;
+    color: #a78bfa;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .problem-box .known {
+    font-size: 14px;
+    color: #c9d1d9;
+    line-height: 1.7;
+  }
+  .problem-box .prove-line {
+    margin-top: 6px;
+    color: #fbbf24;
+    font-weight: 600;
+  }
+
+  /* Step navigation */
+  .step-nav {
+    display: flex;
+    gap: 6px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #1a2540;
+  }
+  .step-dot {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #1a2540;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .step-dot.active {
+    background: linear-gradient(90deg, #6c5ce7, #a855f7);
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.4);
+  }
+  .step-dot.done {
+    background: #2d4a7a;
+  }
+  .step-dot:hover {
+    transform: scaleY(1.5);
+  }
+  .step-dot .tip {
+    display: none;
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    border: 1px solid #334155;
+  }
+  .step-dot:hover .tip { display: block; }
+
+  /* Proof steps area */
+  .proof-steps {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .proof-steps::-webkit-scrollbar { width: 4px; }
+  .proof-steps::-webkit-scrollbar-thumb { background: #2d4a7a; border-radius: 2px; }
+
+  .step-card {
+    display: none;
+    animation: fadeSlide 0.5s ease;
+  }
+  .step-card.active { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6c5ce7, #a855f7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-size: 17px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+
+  .step-body {
+    padding-left: 42px;
+  }
+  .step-body p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: #b0bcd0;
+    margin-bottom: 10px;
+  }
+
+  /* Congruence box */
+  .cong-box {
+    background: linear-gradient(135deg, #0f2027, #142535);
+    border: 1px solid #1e4060;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+  }
+  .cong-box .cong-title {
+    font-size: 12px;
+    color: #60a5fa;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .cong-box .cong-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    font-size: 14px;
+  }
+  .cong-box .cong-row .bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cong-box .cong-row .bullet.green { background: #34d399; }
+  .cong-box .cong-row .bullet.blue { background: #60a5fa; }
+  .cong-box .cong-row .bullet.yellow { background: #fbbf24; }
+  .cong-box .cong-row .bullet.red { background: #f87171; }
+  .cong-box .cong-row .reason {
+    color: #6b7b9a;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+  .cong-result {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #1e4060;
+    color: #34d399;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* QED box */
+  .qed-box {
+    background: linear-gradient(135deg, #052e16, #0a3a20);
+    border: 1px solid #166534;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 14px 0;
+    text-align: center;
+  }
+  .qed-box .qed-formula {
+    font-size: 20px;
+    color: #4ade80;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .qed-box .qed-sub {
+    font-size: 13px;
+    color: #86efac;
+  }
+  .qed-mark {
+    display: inline-block;
+    background: #166534;
+    color: #4ade80;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+
+  /* Highlight */
+  .hl-green { color: #34d399; }
+  .hl-blue { color: #60a5fa; }
+  .hl-yellow { color: #fbbf24; }
+  .hl-red { color: #f87171; }
+  .hl-purple { color: #a78bfa; }
+  .hl-orange { color: #fb923c; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex;
+    padding: 14px 16px;
+    gap: 10px;
+    border-top: 1px solid #1a2540;
+    background: #0a0f1a;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #2d4a7a;
+    background: linear-gradient(135deg, #141e35, #1a2845);
+    color: #c9d1d9;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .nav-btn:hover {
+    background: linear-gradient(135deg, #1e2d4a, #253a5e);
+    border-color: #4a6fa5;
+    color: white;
+  }
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, #6c5ce7, #a855f7);
+    border-color: #7c6cf7;
+    color: white;
+  }
+  .nav-btn.primary:hover {
+    background: linear-gradient(135deg, #7c6cf7, #b865ff);
+  }
+
+  /* Right angle indicator */
+  .right-angle-note {
+    display: inline-block;
+    background: #1a2540;
+    border: 1px solid #2d4a7a;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #60a5fa;
+    margin: 2px 0;
+  }
+
+  /* Legend box */
+  .legend-box {
+    margin: 10px 0;
+    padding: 10px 14px;
+    background: #111827;
+    border-radius: 8px;
+    border: 1px solid #1e2d4a;
+  }
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+    font-size: 13px;
+    color: #8892a8;
+  }
+  .legend-swatch {
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="badge">第20题</span>
+  <h1>证明 BC = BD（全等三角形法）</h1>
+  <span class="subtitle">作辅助线 · AAS + HL全等</span>
+</div>
+
+<div class="main-container">
+  <!-- Left: Canvas -->
+  <div class="canvas-panel">
+    <div class="canvas-title">📐 几何图形</div>
+    <div class="canvas-wrap">
+      <canvas id="geo" width="540" height="480"></canvas>
+    </div>
+  </div>
+
+  <!-- Right: Proof -->
+  <div class="proof-panel">
+    <div class="problem-box">
+      <div class="label">题目条件</div>
+      <div class="known">
+        如图，在四边形 ADBC 中，对角线为 AB 和 CD。<br>
+        <strong>已知：</strong>\(\angle ACB = \angle ADB\)，\(AC = AD\)<br>
+        <div class="prove-line">求证：\(BC = BD\)</div>
+      </div>
+    </div>
+
+    <div class="step-nav" id="stepNav">
+      <div class="step-dot active" data-step="0"><span class="tip">分析题意</span></div>
+      <div class="step-dot" data-step="1"><span class="tip">作辅助线</span></div>
+      <div class="step-dot" data-step="2"><span class="tip">第一组全等</span></div>
+      <div class="step-dot" data-step="3"><span class="tip">第二组全等</span></div>
+      <div class="step-dot" data-step="4"><span class="tip">得出结论</span></div>
+    </div>
+
+    <div class="proof-steps" id="proofSteps">
+      <!-- Step 0 -->
+      <div class="step-card active" data-step="0">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div class="step-title">分析题意</div>
+        </div>
+        <div class="step-body">
+          <p>观察图形：<span class="hl-purple">A</span> 在上方，<span class="hl-purple">B</span> 在下方，<span class="hl-blue">C</span> 在右侧，<span class="hl-orange">D</span> 在左侧。</p>
+          <p>连接对角线 <span class="hl-yellow">AB</span>，将四边形分为 <span class="hl-blue">△ABC</span> 和 <span class="hl-orange">△ABD</span> 两个三角形。</p>
+          <div class="legend-box">
+            <div class="legend-row"><div class="legend-swatch" style="background:#34d399"></div> AC = AD（已知相等边）</div>
+            <div class="legend-row"><div class="legend-swatch" style="background:#fbbf24"></div> AB 为公共边</div>
+            <div class="legend-row"><div class="legend-swatch" style="background:#60a5fa"></div> ∠C = ∠D（已知相等角）</div>
+          </div>
+          <p>直接用 <span class="hl-red">SSA 不能判定全等</span>，需作辅助线。</p>
+          <p><strong>思路：</strong>过点 A 分别向 BC、BD 作垂线，构造直角三角形，用 <span class="hl-green">AAS</span> 和 <span class="hl-green">HL</span> 判全等。</p>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step-card" data-step="1">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div class="step-title">作辅助线</div>
+        </div>
+        <div class="step-body">
+          <p>过点 <span class="hl-purple">A</span> 作 <span class="hl-red">AH ⊥ BC</span>，垂足为 <span class="hl-red">H</span>。</p>
+          <p>过点 <span class="hl-purple">A</span> 作 <span class="hl-red">AK ⊥ BD</span>，垂足为 <span class="hl-red">K</span>。</p>
+          <div class="legend-box">
+            <div class="legend-row"><div class="legend-swatch" style="background:#f87171"></div> AH⊥BC，AK⊥BD（辅助垂线）</div>
+            <div class="legend-row"><span class="right-angle-note">∠AHC = ∠AKD = 90°</span></div>
+          </div>
+          <p>这样构造了四个直角三角形：</p>
+          <p>• <span class="hl-blue">Rt△AHC</span> 和 <span class="hl-orange">Rt△AKD</span>（含 AC、AD）</p>
+          <p>• <span class="hl-blue">Rt△AHB</span> 和 <span class="hl-orange">Rt△AKB</span>（含 AB 公共边）</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card" data-step="2">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div class="step-title">证 Rt△AHC ≅ Rt△AKD（AAS）</div>
+        </div>
+        <div class="step-body">
+          <p>在 <span class="hl-blue">Rt△AHC</span> 和 <span class="hl-orange">Rt△AKD</span> 中：</p>
+          <div class="cong-box">
+            <div class="cong-title">全等条件 (AAS)</div>
+            <div class="cong-row">
+              <span class="bullet blue"></span>
+              \(\angle AHC = \angle AKD = 90°\) <span class="reason">（作图）</span>
+            </div>
+            <div class="cong-row">
+              <span class="bullet green"></span>
+              \(\angle ACH = \angle ADK\) <span class="reason">（已知 ∠C = ∠D）</span>
+            </div>
+            <div class="cong-row">
+              <span class="bullet yellow"></span>
+              \(AC = AD\) <span class="reason">（已知）</span>
+            </div>
+            <div class="cong-result">
+              ∴ Rt△AHC ≅ Rt△AKD（AAS）
+            </div>
+          </div>
+          <p><strong>推得：</strong></p>
+          <p>• <span class="hl-red">AH = AK</span>（全等三角形对应边相等）</p>
+          <p>• <span class="hl-green">HC = KD</span>（全等三角形对应边相等）</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card" data-step="3">
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <div class="step-title">证 Rt△AHB ≅ Rt△AKB（HL）</div>
+        </div>
+        <div class="step-body">
+          <p>在 <span class="hl-blue">Rt△AHB</span> 和 <span class="hl-orange">Rt△AKB</span> 中：</p>
+          <div class="cong-box">
+            <div class="cong-title">全等条件 (HL)</div>
+            <div class="cong-row">
+              <span class="bullet blue"></span>
+              \(\angle AHB = \angle AKB = 90°\) <span class="reason">（作图）</span>
+            </div>
+            <div class="cong-row">
+              <span class="bullet yellow"></span>
+              \(AB = AB\) <span class="reason">（公共边 — 斜边）</span>
+            </div>
+            <div class="cong-row">
+              <span class="bullet red"></span>
+              \(AH = AK\) <span class="reason">（由第3步得）</span>
+            </div>
+            <div class="cong-result">
+              ∴ Rt△AHB ≅ Rt△AKB（HL）
+            </div>
+          </div>
+          <p><strong>推得：</strong></p>
+          <p>• <span class="hl-green">BH = BK</span>（全等三角形对应边相等）</p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card" data-step="4">
+        <div class="step-header">
+          <div class="step-num">5</div>
+          <div class="step-title">得出结论</div>
+        </div>
+        <div class="step-body">
+          <p>因为 H 在线段 BC 上，K 在线段 BD 上，所以：</p>
+          <div class="cong-box">
+            <div class="cong-title">等量代换</div>
+            <div class="cong-row">
+              <span class="bullet green"></span>
+              \(BC = BH + HC\)
+            </div>
+            <div class="cong-row">
+              <span class="bullet green"></span>
+              \(BD = BK + KD\)
+            </div>
+            <div class="cong-row">
+              <span class="bullet yellow"></span>
+              由第3步：\(HC = KD\)
+            </div>
+            <div class="cong-row">
+              <span class="bullet red"></span>
+              由第4步：\(BH = BK\)
+            </div>
+          </div>
+          <div class="qed-box">
+            <div class="qed-formula">\(BC = BH + HC = BK + KD = BD\)</div>
+            <div class="qed-sub">∴ BC = BD，证毕</div>
+            <span class="qed-mark">Q.E.D. ∎</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="nav-btn" id="prevBtn" disabled onclick="navigate(-1)">← 上一步</button>
+      <button class="nav-btn primary" id="nextBtn" onclick="navigate(1)">下一步 →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== Step Navigation ==========
+let currentStep = 0;
+const totalSteps = 5;
+
+function navigate(dir) {
+  const next = currentStep + dir;
+  if (next < 0 || next >= totalSteps) return;
+  goToStep(next);
+}
+
+function goToStep(n) {
+  currentStep = n;
+  // Update dots
+  document.querySelectorAll('.step-dot').forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i === n) d.classList.add('active');
+    else if (i < n) d.classList.add('done');
+  });
+  // Update cards
+  document.querySelectorAll('.step-card').forEach((c, i) => {
+    c.classList.toggle('active', i === n);
+  });
+  // Buttons
+  document.getElementById('prevBtn').disabled = (n === 0);
+  const nb = document.getElementById('nextBtn');
+  if (n === totalSteps - 1) {
+    nb.textContent = '✓ 证毕';
+    nb.disabled = true;
+  } else {
+    nb.innerHTML = '下一步 →';
+    nb.disabled = false;
+  }
+  drawCanvas();
+}
+
+// Click dots
+document.querySelectorAll('.step-dot').forEach(d => {
+  d.addEventListener('click', () => goToStep(+d.dataset.step));
+});
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') navigate(1);
+  if (e.key === 'ArrowLeft') navigate(-1);
+});
+
+// ========== Canvas Drawing ==========
+const cv = document.getElementById('geo');
+const ctx = cv.getContext('2d');
+
+// Vertices
+const A = [270, 55];
+const B = [270, 400];
+const C = [450, 180];
+const D = [90, 180];
+
+// Compute H = foot of perp from A onto BC
+function footOfPerp(P, L1, L2) {
+  const dx = L2[0] - L1[0], dy = L2[1] - L1[1];
+  const t = ((P[0]-L1[0])*dx + (P[1]-L1[1])*dy) / (dx*dx + dy*dy);
+  return [L1[0] + t*dx, L1[1] + t*dy];
+}
+const H = footOfPerp(A, B, C);
+const K = footOfPerp(A, B, D);
+
+function drawLine(p1, p2, color, width, dash) {
+  ctx.beginPath();
+  ctx.setLineDash(dash || []);
+  ctx.moveTo(p1[0], p1[1]);
+  ctx.lineTo(p2[0], p2[1]);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width || 2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawPoint(p, color, r) {
+  ctx.beginPath();
+  ctx.arc(p[0], p[1], r || 5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function drawLabel(text, p, dx, dy, color, size) {
+  ctx.font = `bold ${size || 16}px -apple-system, sans-serif`;
+  ctx.fillStyle = color || '#c9d1d9';
+  ctx.fillText(text, p[0] + (dx||0), p[1] + (dy||0));
+}
+
+function drawRightAngle(vertex, p1, p2, size, color) {
+  // Draw right angle marker at vertex, arms toward p1 and p2
+  const s = size || 12;
+  const d1 = [p1[0]-vertex[0], p1[1]-vertex[1]];
+  const d2 = [p2[0]-vertex[0], p2[1]-vertex[1]];
+  const len1 = Math.sqrt(d1[0]*d1[0]+d1[1]*d1[1]);
+  const len2 = Math.sqrt(d2[0]*d2[0]+d2[1]*d2[1]);
+  const u1 = [d1[0]/len1*s, d1[1]/len1*s];
+  const u2 = [d2[0]/len2*s, d2[1]/len2*s];
+  ctx.beginPath();
+  ctx.moveTo(vertex[0]+u1[0], vertex[1]+u1[1]);
+  ctx.lineTo(vertex[0]+u1[0]+u2[0], vertex[1]+u1[1]+u2[1]);
+  ctx.lineTo(vertex[0]+u2[0], vertex[1]+u2[1]);
+  ctx.strokeStyle = color || '#60a5fa';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function drawAngleArc(vertex, p1, p2, radius, color) {
+  const a1 = Math.atan2(p1[1]-vertex[1], p1[0]-vertex[0]);
+  const a2 = Math.atan2(p2[1]-vertex[1], p2[0]-vertex[0]);
+  ctx.beginPath();
+  ctx.arc(vertex[0], vertex[1], radius || 20, Math.min(a1,a2), Math.max(a1,a2));
+  ctx.strokeStyle = color || '#fbbf24';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawEqualTick(p1, p2, n, color) {
+  const mx = (p1[0]+p2[0])/2, my = (p1[1]+p2[1])/2;
+  const dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const nx = -dy/len, ny = dx/len; // perpendicular
+  const tickLen = 8;
+  const gap = 5;
+  ctx.strokeStyle = color || '#34d399';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < n; i++) {
+    const off = (i - (n-1)/2) * gap;
+    const cx = mx + off * dx/len;
+    const cy = my + off * dy/len;
+    ctx.beginPath();
+    ctx.moveTo(cx - nx*tickLen, cy - ny*tickLen);
+    ctx.lineTo(cx + nx*tickLen, cy + ny*tickLen);
+    ctx.stroke();
+  }
+}
+
+function fillTriangle(p1, p2, p3, color) {
+  ctx.beginPath();
+  ctx.moveTo(p1[0], p1[1]);
+  ctx.lineTo(p2[0], p2[1]);
+  ctx.lineTo(p3[0], p3[1]);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function drawCanvas() {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+
+  const step = currentStep;
+
+  // Step 0: basic kite shape
+  if (step >= 0) {
+    // Fill triangles lightly
+    if (step >= 1) {
+      fillTriangle(A, H, C, 'rgba(96, 165, 250, 0.06)');
+      fillTriangle(A, K, D, 'rgba(251, 146, 60, 0.06)');
+      fillTriangle(A, H, B, 'rgba(96, 165, 250, 0.04)');
+      fillTriangle(A, K, B, 'rgba(251, 146, 60, 0.04)');
+    } else {
+      fillTriangle(A, B, C, 'rgba(96, 165, 250, 0.06)');
+      fillTriangle(A, B, D, 'rgba(251, 146, 60, 0.06)');
+    }
+
+    // Main edges
+    drawLine(A, C, '#34d399', 2.5);  // AC
+    drawLine(A, D, '#34d399', 2.5);  // AD
+    drawLine(B, C, '#60a5fa', 2);    // BC
+    drawLine(B, D, '#fb923c', 2);    // BD
+
+    // Diagonal AB
+    drawLine(A, B, '#fbbf24', 2, [6, 4]);  // AB dashed
+
+    // Equal ticks on AC, AD
+    drawEqualTick(A, C, 1, '#34d399');
+    drawEqualTick(A, D, 1, '#34d399');
+
+    // Angle arcs at C and D
+    drawAngleArc(C, A, B, 22, '#60a5fa');
+    drawAngleArc(D, A, B, 22, '#fb923c');
+  }
+
+  // Step 1+: auxiliary lines AH, AK
+  if (step >= 1) {
+    drawLine(A, H, '#f87171', 2, [4, 3]);
+    drawLine(A, K, '#f87171', 2, [4, 3]);
+    drawRightAngle(H, A, C, 10, '#f87171');
+    drawRightAngle(K, A, D, 10, '#f87171');
+    drawPoint(H, '#f87171', 4);
+    drawPoint(K, '#f87171', 4);
+    drawLabel('H', H, 6, 16, '#f87171', 14);
+    drawLabel('K', K, -24, 16, '#f87171', 14);
+  }
+
+  // Step 2: highlight AHC ≅ AKD
+  if (step === 2) {
+    drawLine(A, H, '#60a5fa', 3);
+    drawLine(H, C, '#60a5fa', 3);
+    drawLine(A, C, '#60a5fa', 3);
+    drawLine(A, K, '#fb923c', 3);
+    drawLine(K, D, '#fb923c', 3);
+    drawLine(A, D, '#fb923c', 3);
+    // Tick marks for result AH=AK
+    drawEqualTick(A, H, 2, '#f87171');
+    drawEqualTick(A, K, 2, '#f87171');
+    // Tick marks for HC=KD
+    drawEqualTick(H, C, 3, '#34d399');
+    drawEqualTick(K, D, 3, '#34d399');
+  }
+
+  // Step 3: highlight AHB ≅ AKB
+  if (step === 3) {
+    drawLine(A, H, '#60a5fa', 3);
+    drawLine(H, B, '#60a5fa', 3);
+    drawLine(A, B, '#60a5fa', 3);
+    drawLine(A, K, '#fb923c', 3);
+    drawLine(K, B, '#fb923c', 3);
+    drawLine(A, B, '#fb923c', 3);
+    // AH=AK
+    drawEqualTick(A, H, 2, '#f87171');
+    drawEqualTick(A, K, 2, '#f87171');
+    // BH=BK result
+    drawEqualTick(B, H, 2, '#fbbf24');
+    drawEqualTick(B, K, 2, '#fbbf24');
+  }
+
+  // Step 4: final - highlight BC=BD
+  if (step === 4) {
+    drawLine(B, C, '#4ade80', 3.5);
+    drawLine(B, D, '#4ade80', 3.5);
+    drawEqualTick(B, C, 2, '#4ade80');
+    drawEqualTick(B, D, 2, '#4ade80');
+    // Show components
+    drawEqualTick(B, H, 2, '#fbbf24');
+    drawEqualTick(B, K, 2, '#fbbf24');
+    drawEqualTick(H, C, 3, '#34d399');
+    drawEqualTick(K, D, 3, '#34d399');
+    drawPoint(H, '#f87171', 4);
+    drawPoint(K, '#f87171', 4);
+    drawLabel('H', H, 6, 16, '#f87171', 14);
+    drawLabel('K', K, -24, 16, '#f87171', 14);
+  }
+
+  // Labels always
+  drawPoint(A, '#e2e8f0', 5);
+  drawPoint(B, '#e2e8f0', 5);
+  drawPoint(C, '#e2e8f0', 5);
+  drawPoint(D, '#e2e8f0', 5);
+  drawLabel('A', A, -6, -14, '#e2e8f0', 18);
+  drawLabel('B', B, -6, 22, '#e2e8f0', 18);
+  drawLabel('C', C, 10, 6, '#60a5fa', 18);
+  drawLabel('D', D, -26, 6, '#fb923c', 18);
+
+  // Step indicator text
+  const stepNames = ['① 分析题意', '② 作辅助线 AH⊥BC, AK⊥BD', '③ Rt△AHC ≅ Rt△AKD (AAS)', '④ Rt△AHB ≅ Rt△AKB (HL)', '⑤ BC = BH+HC = BK+KD = BD'];
+  ctx.font = '13px -apple-system, sans-serif';
+  ctx.fillStyle = '#6b7b9a';
+  ctx.fillText(stepNames[step], 14, cv.height - 14);
+}
+
+// ========== Init ==========
+drawCanvas();
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: '\\(', right: '\\)', display: false},
+    {left: '\\[', right: '\\]', display: true}
+  ]
+});
+</script>
+</body>
+</html>

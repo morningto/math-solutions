@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数学题解答 - 梯形角平分线问题</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-purple: #a78bfa;
+      --accent-red: #f87171;
+      --accent-yellow: #fbbf24;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+      padding: 16px 24px;
+    }
+    .header h1 {
+      font-size: 18px;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+    .header .problem-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .step-nav {
+      display: flex;
+      gap: 6px;
+      padding: 12px 24px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+      flex-wrap: wrap;
+    }
+    .step-btn {
+      padding: 6px 16px;
+      border: 1px solid var(--bg-tertiary);
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .step-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .step-btn.active {
+      background: var(--accent-blue);
+      color: var(--bg-primary);
+      border-color: var(--accent-blue);
+      font-weight: 600;
+    }
+    .step-btn.completed {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+    .main-area {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 180px);
+    }
+    .canvas-panel {
+      flex: 0 0 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--bg-tertiary);
+      padding: 10px;
+    }
+    canvas {
+      border-radius: 8px;
+      background: #0c1222;
+    }
+    .proof-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .proof-panel h2 {
+      color: var(--accent-blue);
+      font-size: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .proof-panel h2 .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 400;
+    }
+    .badge-prove { background: var(--accent-purple); color: #fff; }
+    .badge-aux { background: var(--accent-orange); color: #fff; }
+    .badge-conclude { background: var(--accent-green); color: var(--bg-primary); }
+    .proof-block {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-left: 3px solid var(--accent-blue);
+      line-height: 2;
+      font-size: 15px;
+    }
+    .proof-block.highlight {
+      border-left-color: var(--accent-green);
+      background: rgba(74, 222, 128, 0.08);
+    }
+    .proof-block.auxiliary {
+      border-left-color: var(--accent-orange);
+      background: rgba(251, 146, 60, 0.08);
+    }
+    .proof-line {
+      margin-bottom: 8px;
+    }
+    .reason {
+      color: var(--accent-purple);
+      font-size: 13px;
+    }
+    .conclusion {
+      color: var(--accent-green);
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .qed {
+      text-align: right;
+      color: var(--accent-green);
+      font-size: 20px;
+      margin-top: 12px;
+    }
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--bg-tertiary);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .nav-btn {
+      padding: 8px 24px;
+      border: 1px solid var(--accent-blue);
+      background: transparent;
+      color: var(--accent-blue);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background: var(--accent-blue); color: var(--bg-primary); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn:disabled:hover { background: transparent; color: var(--accent-blue); }
+    .step-indicator { color: var(--text-secondary); font-size: 14px; }
+    .katex { font-size: 1.1em; }
+    @media (max-width: 768px) {
+      .main-area { flex-direction: column; height: auto; }
+      .canvas-panel { flex: none; height: 300px; border-right: none; border-bottom: 1px solid var(--bg-tertiary); }
+      .proof-panel { padding: 16px; padding-bottom: 80px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📐 第19题 · 梯形角平分线证明</h1>
+    <div class="problem-text">
+      如图，已知 $AD \parallel BC$，点 $E$ 为 $CD$ 上一点，且 $AE$、$BE$ 分别平分 $\angle DAB$、$\angle CBA$。<br>
+      (1) 求证：$AE \perp BE$　　(2) 求证：$DE = CE$
+    </div>
+  </div>
+
+  <div class="step-nav" id="stepNav"></div>
+
+  <div class="main-area">
+    <div class="canvas-panel">
+      <canvas id="geo" width="520" height="420"></canvas>
+    </div>
+    <div class="proof-panel" id="proofPanel"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" id="prevBtn" onclick="goStep(currentStep-1)">◀ 上一步</button>
+    <span class="step-indicator" id="stepIndicator"></span>
+    <button class="nav-btn" id="nextBtn" onclick="goStep(currentStep+1)">下一步 ▶</button>
+  </div>
+
+  <script>
+    // ============ Geometry Setup ============
+    const W = 520, H = 420;
+    const dpr = window.devicePixelRatio || 1;
+    const canvas = document.getElementById('geo');
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Trapezoid points (screen coords)
+    // A(top-left), D(top-right), B(bottom-left), C(bottom-right)
+    // AD is shorter top base, BC is longer bottom base
+    const A = {x: 140, y: 90};
+    const D = {x: 340, y: 90};
+    const B = {x: 60, y: 330};
+    const C = {x: 430, y: 330};
+    // E = midpoint of CD
+    const E = {x: (C.x + D.x) / 2, y: (C.y + D.y) / 2};
+    // F on AB, midpoint
+    const F = {x: (A.x + B.x) / 2, y: (A.y + B.y) / 2};
+
+    // ============ Drawing helpers ============
+    function drawLine(x1, y1, x2, y2, color, width, dash) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width || 2;
+      if (dash) ctx.setLineDash(dash);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPoint(x, y, label, color, offsetX, offsetY) {
+      ctx.fillStyle = color || '#fff';
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = 'bold 16px -apple-system, sans-serif';
+      ctx.fillStyle = color || '#fff';
+      ctx.fillText(label, x + (offsetX || 8), y + (offsetY || -8));
+    }
+
+    function drawAngleArc(cx, cy, p1, p2, radius, color, label, labelRadius) {
+      const a1 = Math.atan2(p1.y - cy, p1.x - cx);
+      const a2 = Math.atan2(p2.y - cy, p2.x - cx);
+      let start = a1, end = a2;
+      // Ensure we draw the smaller arc
+      let diff = end - start;
+      if (diff < -Math.PI) end += 2 * Math.PI;
+      if (diff > Math.PI) start += 2 * Math.PI;
+      if (start > end) { let tmp = start; start = end; end = tmp; }
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, start, end);
+      ctx.stroke();
+
+      if (label) {
+        const mid = (start + end) / 2;
+        const lr = labelRadius || (radius + 14);
+        ctx.font = '13px -apple-system, sans-serif';
+        ctx.fillStyle = color;
+        ctx.fillText(label, cx + lr * Math.cos(mid) - 4, cy + lr * Math.sin(mid) + 4);
+      }
+      ctx.restore();
+    }
+
+    function drawRightAngle(cx, cy, p1, p2, size, color) {
+      const d1 = {x: p1.x - cx, y: p1.y - cy};
+      const d2 = {x: p2.x - cx, y: p2.y - cy};
+      const len1 = Math.hypot(d1.x, d1.y);
+      const len2 = Math.hypot(d2.x, d2.y);
+      const u1 = {x: d1.x / len1 * size, y: d1.y / len1 * size};
+      const u2 = {x: d2.x / len2 * size, y: d2.y / len2 * size};
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx + u1.x, cy + u1.y);
+      ctx.lineTo(cx + u1.x + u2.x, cy + u1.y + u2.y);
+      ctx.lineTo(cx + u2.x, cy + u2.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawParallelMark(x1, y1, x2, y2, color) {
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const dx = x2 - x1, dy = y2 - y1;
+      const len = Math.hypot(dx, dy);
+      const ux = dx / len, uy = dy / len;
+      const s = 6;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      for (let offset of [-4, 4]) {
+        const px = mx + ux * offset, py = my + uy * offset;
+        ctx.beginPath();
+        ctx.moveTo(px - uy * s + ux * s * 0.3, py + ux * s + uy * s * 0.3);
+        ctx.lineTo(px, py);
+        ctx.lineTo(px + uy * s + ux * s * 0.3, py - ux * s + uy * s * 0.3);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function fillTriangle(p1, p2, p3, color) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawEqualMark(x1, y1, x2, y2, color, count) {
+      const mx = (x1+x2)/2, my = (y1+y2)/2;
+      const dx = x2-x1, dy = y2-y1;
+      const len = Math.hypot(dx, dy);
+      const nx = -dy/len, ny = dx/len; // normal
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      const gap = 4;
+      for (let i = 0; i < (count||1); i++) {
+        const off = (i - (count-1)/2) * gap;
+        const px = mx + dx/len * off, py = my + dy/len * off;
+        ctx.beginPath();
+        ctx.moveTo(px + nx*5, py + ny*5);
+        ctx.lineTo(px - nx*5, py - ny*5);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // ============ Steps ============
+    const steps = [
+      {
+        title: '分析题意',
+        badge: null,
+        draw: (progress) => {
+          drawBaseTrapezoid(1);
+          drawLine(A.x, A.y, E.x, E.y, 'rgba(56,189,248,0.5)', 1.5);
+          drawLine(B.x, B.y, E.x, E.y, 'rgba(56,189,248,0.5)', 1.5);
+          drawAllPoints();
+          drawParallelMark(A.x, A.y, D.x, D.y, 'var(--accent-yellow)');
+          drawParallelMark(B.x, B.y, C.x, C.y, 'var(--accent-yellow)');
+        },
+        html: `
+          <h2>分析题意</h2>
+          <div class="proof-block">
+            <div class="proof-line"><strong>已知条件：</strong></div>
+            <div class="proof-line">• 四边形 $ABCD$ 中，$AD \\parallel BC$（梯形）</div>
+            <div class="proof-line">• $E$ 为 $CD$ 上一点</div>
+            <div class="proof-line">• $AE$ 平分 $\\angle DAB$，即 $\\angle DAE = \\angle EAB$</div>
+            <div class="proof-line">• $BE$ 平分 $\\angle CBA$，即 $\\angle CBE = \\angle EBA$</div>
+          </div>
+          <div class="proof-block">
+            <div class="proof-line"><strong>求证：</strong></div>
+            <div class="proof-line">(1) $AE \\perp BE$</div>
+            <div class="proof-line">(2) $DE = CE$</div>
+          </div>
+          <div class="proof-block">
+            <div class="proof-line"><strong>解题思路：</strong></div>
+            <div class="proof-line">• (1) 利用「同旁内角互补」+ 「三角形内角和」</div>
+            <div class="proof-line">• (2) 作辅助线 $EF \\parallel AD$，利用「内错角」构造等腰三角形，再用「平行线分线段成比例」</div>
+          </div>
+        `
+      },
+      {
+        title: '(1) 同旁内角',
+        badge: 'prove',
+        draw: (progress) => {
+          drawBaseTrapezoid(1);
+          drawLine(A.x, A.y, E.x, E.y, 'rgba(56,189,248,0.4)', 1);
+          drawLine(B.x, B.y, E.x, E.y, 'rgba(56,189,248,0.4)', 1);
+          // Highlight AD and BC parallel
+          drawLine(A.x, A.y, D.x, D.y, '#fbbf24', 3);
+          drawLine(B.x, B.y, C.x, C.y, '#fbbf24', 3);
+          // Highlight AB as transversal
+          drawLine(A.x, A.y, B.x, B.y, var_accent_orange, 2.5);
+          // ∠DAB
+          drawAngleArc(A.x, A.y, D, B, 35, '#f87171', '2α', 50);
+          // ∠CBA (= ∠ABC)
+          drawAngleArc(B.x, B.y, A, C, 35, '#a78bfa', '2β', 50);
+          drawAllPoints();
+          drawParallelMark(A.x, A.y, D.x, D.y, '#fbbf24');
+          drawParallelMark(B.x, B.y, C.x, C.y, '#fbbf24');
+        },
+        html: `
+          <h2><span class="badge badge-prove">证明</span> 同旁内角互补</h2>
+          <div class="proof-block">
+            <div class="proof-line">设 $\\angle DAB = 2\\alpha$，$\\angle CBA = 2\\beta$</div>
+            <div class="proof-line">∵ $AD \\parallel BC$，$AB$ 为截线</div>
+            <div class="proof-line">∴ $\\angle DAB + \\angle CBA = 180°$ <span class="reason">（同旁内角互补）</span></div>
+            <div class="proof-line">即 $2\\alpha + 2\\beta = 180°$</div>
+            <div class="proof-line conclusion">∴ $\\alpha + \\beta = 90°$</div>
+          </div>
+        `
+      },
+      {
+        title: '(1) AE⊥BE',
+        badge: 'conclude',
+        draw: (progress) => {
+          drawBaseTrapezoid(1);
+          // AE and BE highlighted
+          drawLine(A.x, A.y, E.x, E.y, '#38bdf8', 2.5);
+          drawLine(B.x, B.y, E.x, E.y, '#a78bfa', 2.5);
+          // angle marks
+          drawAngleArc(A.x, A.y, D, E, 30, '#f87171', 'α');
+          drawAngleArc(A.x, A.y, E, B, 45, '#f87171', 'α', 58);
+          drawAngleArc(B.x, B.y, A, E, 45, '#a78bfa', 'β', 58);
+          drawAngleArc(B.x, B.y, E, C, 30, '#a78bfa', 'β');
+          // Right angle at E
+          drawRightAngle(E.x, E.y, A, B, 14, '#4ade80');
+          // Highlight triangle ABE
+          fillTriangle(A, B, E, 'rgba(56,189,248,0.08)');
+          drawAllPoints();
+        },
+        html: `
+          <h2><span class="badge badge-conclude">结论</span> 证明 $AE \\perp BE$</h2>
+          <div class="proof-block">
+            <div class="proof-line">∵ $AE$ 平分 $\\angle DAB$</div>
+            <div class="proof-line">∴ $\\angle EAB = \\dfrac{1}{2}\\angle DAB = \\alpha$</div>
+            <br>
+            <div class="proof-line">∵ $BE$ 平分 $\\angle CBA$</div>
+            <div class="proof-line">∴ $\\angle EBA = \\dfrac{1}{2}\\angle CBA = \\beta$</div>
+          </div>
+          <div class="proof-block highlight">
+            <div class="proof-line">在 $\\triangle ABE$ 中：</div>
+            <div class="proof-line">$\\angle AEB = 180° - \\angle EAB - \\angle EBA$</div>
+            <div class="proof-line">$= 180° - \\alpha - \\beta$</div>
+            <div class="proof-line">$= 180° - 90°$</div>
+            <div class="proof-line conclusion">$= 90°$</div>
+            <br>
+            <div class="proof-line conclusion">∴ $AE \\perp BE$ &emsp;□</div>
+          </div>
+        `
+      },
+      {
+        title: '(2) 作辅助线',
+        badge: 'aux',
+        draw: (progress) => {
+          drawBaseTrapezoid(1);
+          drawLine(A.x, A.y, E.x, E.y, 'rgba(56,189,248,0.5)', 1.5);
+          drawLine(B.x, B.y, E.x, E.y, 'rgba(167,139,250,0.5)', 1.5);
+          // Draw EF parallel to AD
+          drawLine(E.x, E.y, F.x, F.y, '#fb923c', 2.5, [6, 4]);
+          // Parallel marks
+          drawParallelMark(A.x, A.y, D.x, D.y, '#fbbf24');
+          drawParallelMark(B.x, B.y, C.x, C.y, '#fbbf24');
+          drawParallelMark(E.x, E.y, F.x, F.y, '#fb923c');
+          drawAllPoints();
+          drawPoint(F.x, F.y, 'F', '#fb923c', -20, -8);
+        },
+        html: `
+          <h2><span class="badge badge-aux">辅助线</span> 作 $EF \\parallel AD$</h2>
+          <div class="proof-block auxiliary">
+            <div class="proof-line">过 $E$ 作 $EF \\parallel AD$（即 $EF \\parallel BC$），$F$ 在 $AB$ 上</div>
+            <br>
+            <div class="proof-line"><strong>目标：</strong>证明 $F$ 是 $AB$ 的中点</div>
+            <div class="proof-line">然后利用平行线分线段成比例定理得 $DE = CE$</div>
+          </div>
+        `
+      },
+      {
+        title: '(2) △AEF等腰',
+        badge: 'prove',
+        draw: (progress) => {
+          drawBaseTrapezoid(0.4);
+          // Highlight triangle AEF
+          fillTriangle(A, E, F, 'rgba(248,113,113,0.12)');
+          drawLine(A.x, A.y, E.x, E.y, '#f87171', 2.5);
+          drawLine(A.x, A.y, F.x, F.y, '#f87171', 2);
+          drawLine(E.x, E.y, F.x, F.y, '#fb923c', 2.5, [6, 4]);
+          // AD dashed for reference
+          drawLine(A.x, A.y, D.x, D.y, 'rgba(251,191,36,0.4)', 1.5);
+          // Angle marks
+          drawAngleArc(A.x, A.y, D, E, 30, '#f87171', 'α');
+          drawAngleArc(A.x, A.y, E, F, 50, '#fb923c', 'α', 62);
+          drawAngleArc(E.x, E.y, A, F, 28, '#fb923c', 'α', 42);
+          // Equal marks on AF and EF
+          drawEqualMark(A.x, A.y, F.x, F.y, '#4ade80', 1);
+          drawEqualMark(E.x, E.y, F.x, F.y, '#4ade80', 1);
+          drawAllPoints();
+          drawPoint(F.x, F.y, 'F', '#fb923c', -20, -8);
+          drawParallelMark(A.x, A.y, D.x, D.y, 'rgba(251,191,36,0.5)');
+          drawParallelMark(E.x, E.y, F.x, F.y, '#fb923c');
+        },
+        html: `
+          <h2><span class="badge badge-prove">证明</span> $\\triangle AEF$ 等腰</h2>
+          <div class="proof-block">
+            <div class="proof-line">∵ $EF \\parallel AD$，$AE$ 为截线</div>
+            <div class="proof-line">∴ $\\angle AEF = \\angle DAE = \\alpha$ <span class="reason">（内错角相等）</span></div>
+            <br>
+            <div class="proof-line">又∵ $AE$ 平分 $\\angle DAB$</div>
+            <div class="proof-line">∴ $\\angle EAF = \\angle EAB = \\alpha$</div>
+            <br>
+            <div class="proof-line">∴ $\\angle AEF = \\angle EAF = \\alpha$</div>
+          </div>
+          <div class="proof-block highlight">
+            <div class="proof-line">$\\triangle AEF$ 是等腰三角形</div>
+            <div class="proof-line conclusion">∴ $AF = EF$</div>
+          </div>
+        `
+      },
+      {
+        title: '(2) △BEF等腰',
+        badge: 'prove',
+        draw: (progress) => {
+          drawBaseTrapezoid(0.4);
+          // Highlight triangle BEF
+          fillTriangle(B, E, F, 'rgba(167,139,250,0.12)');
+          drawLine(B.x, B.y, E.x, E.y, '#a78bfa', 2.5);
+          drawLine(B.x, B.y, F.x, F.y, '#a78bfa', 2);
+          drawLine(E.x, E.y, F.x, F.y, '#fb923c', 2.5, [6, 4]);
+          // BC for reference
+          drawLine(B.x, B.y, C.x, C.y, 'rgba(251,191,36,0.4)', 1.5);
+          // Angle marks
+          drawAngleArc(B.x, B.y, C, E, 30, '#a78bfa', 'β');
+          drawAngleArc(B.x, B.y, E, F, 55, '#fb923c', 'β', 68);
+          drawAngleArc(E.x, E.y, F, B, 28, '#fb923c', 'β', 42);
+          // Equal marks on BF and EF
+          drawEqualMark(B.x, B.y, F.x, F.y, '#4ade80', 2);
+          drawEqualMark(E.x, E.y, F.x, F.y, '#4ade80', 2);
+          drawAllPoints();
+          drawPoint(F.x, F.y, 'F', '#fb923c', -20, -8);
+          drawParallelMark(B.x, B.y, C.x, C.y, 'rgba(251,191,36,0.5)');
+          drawParallelMark(E.x, E.y, F.x, F.y, '#fb923c');
+        },
+        html: `
+          <h2><span class="badge badge-prove">证明</span> $\\triangle BEF$ 等腰</h2>
+          <div class="proof-block">
+            <div class="proof-line">∵ $EF \\parallel BC$，$BE$ 为截线</div>
+            <div class="proof-line">∴ $\\angle BEF = \\angle CBE = \\beta$ <span class="reason">（内错角相等）</span></div>
+            <br>
+            <div class="proof-line">又∵ $BE$ 平分 $\\angle CBA$</div>
+            <div class="proof-line">∴ $\\angle EBF = \\angle ABE = \\beta$</div>
+            <br>
+            <div class="proof-line">∴ $\\angle BEF = \\angle EBF = \\beta$</div>
+          </div>
+          <div class="proof-block highlight">
+            <div class="proof-line">$\\triangle BEF$ 是等腰三角形</div>
+            <div class="proof-line conclusion">∴ $BF = EF$</div>
+          </div>
+        `
+      },
+      {
+        title: '(2) F是中点',
+        badge: 'prove',
+        draw: (progress) => {
+          drawBaseTrapezoid(0.5);
+          drawLine(A.x, A.y, E.x, E.y, 'rgba(56,189,248,0.4)', 1.5);
+          drawLine(B.x, B.y, E.x, E.y, 'rgba(167,139,250,0.4)', 1.5);
+          drawLine(E.x, E.y, F.x, F.y, '#fb923c', 2.5, [6, 4]);
+          // AB highlighted, F is midpoint
+          drawLine(A.x, A.y, F.x, F.y, '#4ade80', 3);
+          drawLine(F.x, F.y, B.x, B.y, '#4ade80', 3);
+          // Equal marks
+          drawEqualMark(A.x, A.y, F.x, F.y, '#4ade80', 3);
+          drawEqualMark(F.x, F.y, B.x, B.y, '#4ade80', 3);
+          drawAllPoints();
+          drawPoint(F.x, F.y, 'F', '#fb923c', -22, -8);
+          // Midpoint marker
+          ctx.save();
+          ctx.font = '12px -apple-system, sans-serif';
+          ctx.fillStyle = '#4ade80';
+          ctx.fillText('中点', F.x - 30, F.y + 20);
+          ctx.restore();
+        },
+        html: `
+          <h2><span class="badge badge-prove">推导</span> $F$ 是 $AB$ 的中点</h2>
+          <div class="proof-block">
+            <div class="proof-line">由第 ⑤ 步：$AF = EF$</div>
+            <div class="proof-line">由第 ⑥ 步：$BF = EF$</div>
+            <br>
+            <div class="proof-line conclusion">∴ $AF = BF = EF$</div>
+            <br>
+            <div class="proof-line">因此 $F$ 是 $AB$ 的中点</div>
+          </div>
+        `
+      },
+      {
+        title: '(2) DE=CE ✓',
+        badge: 'conclude',
+        draw: (progress) => {
+          drawBaseTrapezoid(1);
+          drawLine(A.x, A.y, E.x, E.y, 'rgba(56,189,248,0.5)', 1.5);
+          drawLine(B.x, B.y, E.x, E.y, 'rgba(167,139,250,0.5)', 1.5);
+          // Three parallel lines highlighted
+          drawLine(A.x, A.y, D.x, D.y, '#fbbf24', 2.5);
+          drawLine(E.x, E.y, F.x, F.y, '#fb923c', 2.5, [6, 4]);
+          drawLine(B.x, B.y, C.x, C.y, '#fbbf24', 2.5);
+          // AB and CD as transversals
+          drawLine(A.x, A.y, B.x, B.y, 'rgba(255,255,255,0.6)', 2);
+          drawLine(C.x, C.y, D.x, D.y, 'rgba(255,255,255,0.6)', 2);
+          // DE and CE equal marks
+          drawLine(D.x, D.y, E.x, E.y, '#4ade80', 3);
+          drawLine(E.x, E.y, C.x, C.y, '#4ade80', 3);
+          drawEqualMark(D.x, D.y, E.x, E.y, '#4ade80', 1);
+          drawEqualMark(E.x, E.y, C.x, C.y, '#4ade80', 1);
+          // F midpoint marks
+          drawEqualMark(A.x, A.y, F.x, F.y, '#fb923c', 3);
+          drawEqualMark(F.x, F.y, B.x, B.y, '#fb923c', 3);
+          // Parallel marks
+          drawParallelMark(A.x, A.y, D.x, D.y, '#fbbf24');
+          drawParallelMark(E.x, E.y, F.x, F.y, '#fb923c');
+          drawParallelMark(B.x, B.y, C.x, C.y, '#fbbf24');
+          drawRightAngle(E.x, E.y, A, B, 12, '#4ade80');
+          drawAllPoints();
+          drawPoint(F.x, F.y, 'F', '#fb923c', -22, -8);
+        },
+        html: `
+          <h2><span class="badge badge-conclude">结论</span> 证明 $DE = CE$</h2>
+          <div class="proof-block">
+            <div class="proof-line">三条平行线 $AD$、$EF$、$BC$ 分别截直线 $AB$ 和直线 $CD$</div>
+            <br>
+            <div class="proof-line">由<strong>平行线分线段成比例定理</strong>：</div>
+            <div class="proof-line" style="font-size:17px;">$$\\frac{AF}{FB} = \\frac{DE}{EC}$$</div>
+          </div>
+          <div class="proof-block highlight">
+            <div class="proof-line">∵ $AF = FB$（$F$ 是 $AB$ 的中点）</div>
+            <div class="proof-line">∴ $\\dfrac{AF}{FB} = 1$</div>
+            <br>
+            <div class="proof-line">∴ $\\dfrac{DE}{EC} = 1$</div>
+            <br>
+            <div class="proof-line conclusion" style="font-size:18px;">∴ $DE = EC$ &emsp;□</div>
+            <div class="qed">证毕 ■</div>
+          </div>
+        `
+      }
+    ];
+
+    const var_accent_orange = '#fb923c';
+
+    function drawBaseTrapezoid(alpha) {
+      const a = alpha || 1;
+      drawLine(A.x, A.y, D.x, D.y, `rgba(251,191,36,${a})`, 2);
+      drawLine(D.x, D.y, C.x, C.y, `rgba(241,245,249,${a * 0.7})`, 2);
+      drawLine(C.x, C.y, B.x, B.y, `rgba(251,191,36,${a})`, 2);
+      drawLine(B.x, B.y, A.x, A.y, `rgba(241,245,249,${a * 0.7})`, 2);
+    }
+
+    function drawAllPoints() {
+      drawPoint(A.x, A.y, 'A', '#38bdf8', -20, -6);
+      drawPoint(D.x, D.y, 'D', '#38bdf8', 10, -6);
+      drawPoint(B.x, B.y, 'B', '#38bdf8', -22, 16);
+      drawPoint(C.x, C.y, 'C', '#38bdf8', 10, 16);
+      drawPoint(E.x, E.y, 'E', '#f87171', 8, 18);
+    }
+
+    // ============ Step Navigation ============
+    let currentStep = 0;
+
+    function renderStepNav() {
+      const nav = document.getElementById('stepNav');
+      nav.innerHTML = steps.map((s, i) => {
+        let cls = 'step-btn';
+        if (i === currentStep) cls += ' active';
+        else if (i < currentStep) cls += ' completed';
+        return `<button class="${cls}" onclick="goStep(${i})">${i < currentStep ? '✓ ' : ''}${s.title}</button>`;
+      }).join('');
+    }
+
+    function goStep(index) {
+      if (index < 0 || index >= steps.length) return;
+      currentStep = index;
+      renderStepNav();
+      renderStep();
+    }
+
+    function renderStep() {
+      const step = steps[currentStep];
+      // Draw canvas
+      ctx.clearRect(0, 0, W, H);
+      step.draw(1);
+      // Proof panel
+      const panel = document.getElementById('proofPanel');
+      panel.innerHTML = step.html;
+      renderMathInElement(panel, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
+      // Nav buttons
+      document.getElementById('prevBtn').disabled = currentStep === 0;
+      document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+      document.getElementById('stepIndicator').textContent = `步骤 ${currentStep + 1} / ${steps.length}`;
+    }
+
+    // ============ Init ============
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMathInElement(document.querySelector('.header'), {
+        delimiters: [{left: '$', right: '$', display: false}]
+      });
+      renderStepNav();
+      renderStep();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goStep(currentStep + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goStep(currentStep - 1); }
+    });
+  </script>
+</body>
+</html>

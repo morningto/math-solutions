@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>初中几何证明 — 等腰三角形中的全等与线段关系</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 1px solid #334155;
+    padding: 10px 20px;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 17px;
+    color: #38bdf8;
+    margin-bottom: 6px;
+  }
+  .header h1 .emoji { margin-right: 6px; }
+  .problem-text {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+    max-width: 900px;
+  }
+
+  /* ===== Step Nav Bar ===== */
+  .step-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .step-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid #475569;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+  .step-btn.active {
+    background: #38bdf8;
+    border-color: #38bdf8;
+    color: #0f172a;
+  }
+  .step-btn.completed {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+  .step-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-left: 4px;
+    margin-right: 12px;
+  }
+
+  /* ===== Main Content Area ===== */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Canvas Side */
+  .canvas-panel {
+    flex: 1 1 50%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #0f172a;
+    position: relative;
+  }
+  canvas {
+    background: #0f172a;
+    border-radius: 8px;
+    border: 1px solid #1e293b;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* Proof Side */
+  .proof-panel {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 16px 20px;
+    background: #1e293b;
+    border-left: 1px solid #334155;
+  }
+  .proof-panel::-webkit-scrollbar { width: 6px; }
+  .proof-panel::-webkit-scrollbar-track { background: #1e293b; }
+  .proof-panel::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+  .proof-step-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #334155;
+  }
+  .proof-block {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    line-height: 1.8;
+    font-size: 14px;
+  }
+  .proof-block.highlight {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.05);
+  }
+  .proof-block.conclusion {
+    border-color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+  }
+  .proof-block h3 {
+    font-size: 14px;
+    color: #38bdf8;
+    margin-bottom: 8px;
+  }
+  .proof-block .label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .label-green { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .label-orange { background: rgba(251,146,60,0.15); color: #fb923c; }
+  .label-blue { background: rgba(56,189,248,0.15); color: #38bdf8; }
+  .label-purple { background: rgba(167,139,250,0.15); color: #a78bfa; }
+  .label-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
+
+  .note-text {
+    font-size: 13px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-top: 8px;
+    padding-left: 10px;
+    border-left: 2px solid #475569;
+  }
+
+  /* ===== Bottom Nav ===== */
+  .bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: #1e293b;
+    border-top: 1px solid #334155;
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: 1px solid #475569;
+    background: transparent;
+    color: #e2e8f0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: #38bdf8; color: #38bdf8; }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn.primary { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 600; }
+  .nav-btn.primary:hover { background: #7dd3fc; }
+  .step-indicator { font-size: 13px; color: #64748b; }
+
+  /* KaTeX overrides */
+  .katex { font-size: 1em; }
+  .proof-block .katex { font-size: 1.05em; }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    .main-content { flex-direction: column; }
+    .canvas-panel { flex: 0 0 45vh; }
+    .proof-panel { flex: 1; border-left: none; border-top: 1px solid #334155; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1><span class="emoji">📐</span>初中几何证明 · 等腰三角形中的全等与线段关系</h1>
+  <div class="problem-text">
+    <strong>题目：</strong>△ABC 中，AB = AC，点 D 在 AB 边上，点 E 在 AC 的延长线上，且 CE = BD，连接 DE 交 BC 于点 F。
+    (1) 求证：EF = DF　(2) 过点 D 作 DG⊥BC，垂足为 G，求证：BC = 2FG
+  </div>
+</div>
+
+<!-- Step Navigation -->
+<div class="step-nav" id="stepNav">
+  <button class="step-btn active" data-step="1">1</button><span class="step-label">审题</span>
+  <button class="step-btn" data-step="2">2</button><span class="step-label">辅助线</span>
+  <button class="step-btn" data-step="3">3</button><span class="step-label">全等①</span>
+  <button class="step-btn" data-step="4">4</button><span class="step-label">全等②</span>
+  <button class="step-btn" data-step="5">5</button><span class="step-label">第⑴问</span>
+  <button class="step-btn" data-step="6">6</button><span class="step-label">第⑵问</span>
+  <button class="step-btn" data-step="7">7</button><span class="step-label">总结</span>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Canvas Panel -->
+  <div class="canvas-panel">
+    <canvas id="geoCanvas" width="700" height="520"></canvas>
+  </div>
+  <!-- Proof Panel -->
+  <div class="proof-panel" id="proofPanel"></div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <button class="nav-btn" id="prevBtn" disabled>◀ 上一步</button>
+  <span class="step-indicator" id="stepIndicator">步骤 1 / 7</span>
+  <button class="nav-btn primary" id="nextBtn">下一步 ▶</button>
+</div>
+
+<script>
+// ==================== GEOMETRY DATA ====================
+const B = {x: 130, y: 370};
+const C = {x: 540, y: 370};
+const A = {x: 335, y: 55};
+const t = 0.35; // BD/BA ratio
+
+// D on AB: D = B + t*(A - B)
+const D = {x: B.x + t*(A.x - B.x), y: B.y + t*(A.y - B.y)};
+
+// E on AC extension beyond C: E = C + t_e * (C - A) where CE = BD
+// BD = t * BA, CE should = BD. |CA| direction from A to C.
+// AC extension beyond C: direction = (C-A)/|CA|
+const CA = {x: C.x - A.x, y: C.y - A.y};
+const lenCA = Math.sqrt(CA.x*CA.x + CA.y*CA.y);
+const BA_vec = {x: A.x - B.x, y: A.y - B.y};
+const lenBA = Math.sqrt(BA_vec.x*BA_vec.x + BA_vec.y*BA_vec.y);
+const BD_len = t * lenBA;
+const CE_ratio = BD_len / lenCA; // CE/CA
+const E = {x: C.x + CE_ratio * CA.x, y: C.y + CE_ratio * CA.y};
+
+// F = DE ∩ BC. BC is y = B.y. Parametric on DE: P = D + s*(E-D)
+// P.y = D.y + s*(E.y - D.y) = B.y => s = (B.y - D.y)/(E.y - D.y)
+const s_f = (B.y - D.y) / (E.y - D.y);
+const F = {x: D.x + s_f*(E.x - D.x), y: B.y};
+
+// G = foot of perpendicular from D to BC (BC is horizontal y=370)
+const G = {x: D.x, y: B.y};
+
+// H = foot of perpendicular from E to line BC (extended)
+const H = {x: E.x, y: B.y};
+
+// ==================== DRAWING HELPERS ====================
+const canvas = document.getElementById('geoCanvas');
+const ctx = canvas.getContext('2d');
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawLine(p1, p2, color='#38bdf8', width=2, dash=[]) {
+  ctx.beginPath();
+  ctx.setLineDash(dash);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawPoint(p, color='#e2e8f0', radius=3.5) {
+  ctx.beginPath();
+  ctx.fillStyle = color;
+  ctx.arc(p.x, p.y, radius, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawLabel(text, p, dx=0, dy=0, color='#e2e8f0', size=15) {
+  ctx.font = `bold ${size}px -apple-system, sans-serif`;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, p.x + dx, p.y + dy);
+}
+
+function drawAngleArc(vertex, p1, p2, radius, color='#fb923c', width=1.5) {
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  // Determine shorter arc direction
+  let start = a1, end = a2;
+  let diff = end - start;
+  if (diff > Math.PI) start += 2*Math.PI;
+  if (diff < -Math.PI) end += 2*Math.PI;
+  ctx.arc(vertex.x, vertex.y, radius, Math.min(start,end), Math.max(start,end));
+  ctx.stroke();
+}
+
+function drawRightAngle(vertex, dir1, dir2, size=10, color='rgba(255,255,255,0.7)') {
+  // dir1, dir2 are unit direction vectors from vertex
+  const p1 = {x: vertex.x + dir1.x*size, y: vertex.y + dir1.y*size};
+  const corner = {x: vertex.x + dir1.x*size + dir2.x*size, y: vertex.y + dir1.y*size + dir2.y*size};
+  const p2 = {x: vertex.x + dir2.x*size, y: vertex.y + dir2.y*size};
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(corner.x, corner.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.stroke();
+}
+
+function drawTickMark(p1, p2, numTicks=1, color='#4ade80') {
+  const mx = (p1.x+p2.x)/2, my = (p1.y+p2.y)/2;
+  const dx = p2.x-p1.x, dy = p2.y-p1.y;
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const nx = -dy/len, ny = dx/len; // perpendicular
+  const tickLen = 8;
+  const gap = 5;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  for (let i = 0; i < numTicks; i++) {
+    const offset = (i - (numTicks-1)/2) * gap;
+    const cx = mx + (dx/len)*offset;
+    const cy = my + (dy/len)*offset;
+    ctx.beginPath();
+    ctx.moveTo(cx - nx*tickLen, cy - ny*tickLen);
+    ctx.lineTo(cx + nx*tickLen, cy + ny*tickLen);
+    ctx.stroke();
+  }
+}
+
+function drawTriangleFill(p1, p2, p3, color) {
+  ctx.beginPath();
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.lineTo(p3.x, p3.y);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+// ==================== STEP DRAWINGS ====================
+function drawStep1() {
+  clearCanvas();
+  // Triangle ABC
+  drawLine(A, B, '#38bdf8', 2.5);
+  drawLine(A, C, '#38bdf8', 2.5);
+  drawLine(B, C, '#38bdf8', 2.5);
+  // Extend AC to E
+  drawLine(C, E, '#38bdf8', 1.5, [6,4]);
+  // DE line
+  drawLine(D, E, '#fb923c', 2);
+  // Points
+  drawPoint(A, '#38bdf8', 4);
+  drawPoint(B, '#38bdf8', 4);
+  drawPoint(C, '#38bdf8', 4);
+  drawPoint(D, '#fbbf24', 4);
+  drawPoint(E, '#fbbf24', 4);
+  drawPoint(F, '#f87171', 4);
+  // Labels
+  drawLabel('A', A, 0, -18, '#38bdf8');
+  drawLabel('B', B, -18, 14, '#38bdf8');
+  drawLabel('C', C, 14, 14, '#38bdf8');
+  drawLabel('D', D, -18, -8, '#fbbf24');
+  drawLabel('E', E, 14, 12, '#fbbf24');
+  drawLabel('F', F, 0, 18, '#f87171');
+  // Tick marks: AB = AC (single tick)
+  drawTickMark(A, B, 1, '#4ade80');
+  drawTickMark(A, C, 1, '#4ade80');
+  // Tick marks: BD = CE (double tick)
+  drawTickMark(B, D, 2, '#4ade80');
+  drawTickMark(C, E, 2, '#4ade80');
+  // Angle arcs at B and C
+  drawAngleArc(B, A, C, 28, '#fb923c', 2);
+  drawAngleArc(C, B, A, 28, '#fb923c', 2);
+  // β labels
+  drawLabel('β', B, 22, -14, '#fb923c', 13);
+  drawLabel('β', C, -20, -14, '#fb923c', 13);
+}
+
+function drawStep2() {
+  clearCanvas();
+  // Base figure
+  drawLine(A, B, '#38bdf8', 1.5);
+  drawLine(A, C, '#38bdf8', 1.5);
+  drawLine(B, C, '#38bdf8', 2);
+  drawLine(C, E, '#38bdf8', 1.2, [6,4]);
+  drawLine(D, E, '#fb923c', 1.5);
+
+  // BC extended to H
+  drawLine(C, H, '#475569', 1.5, [4,4]);
+
+  // DG perpendicular (purple dashed)
+  drawLine(D, G, '#a78bfa', 2.5, [6,3]);
+  // EH perpendicular (purple dashed)
+  drawLine(E, H, '#a78bfa', 2.5, [6,3]);
+
+  // Right angle marks
+  drawRightAngle(G, {x:0, y:-1}, {x:1, y:0}, 10, '#a78bfa');
+  drawRightAngle(H, {x:0, y:-1}, {x:-1, y:0}, 10, '#a78bfa');
+
+  // Highlight DG = EH
+  drawLabel('DG', {x:(D.x+G.x)/2, y:(D.y+G.y)/2}, -22, 0, '#a78bfa', 13);
+  drawLabel('EH', {x:(E.x+H.x)/2, y:(E.y+H.y)/2}, 22, 0, '#a78bfa', 13);
+
+  // Points
+  drawPoint(A, '#38bdf8', 3);
+  drawPoint(B, '#38bdf8', 4);
+  drawPoint(C, '#38bdf8', 4);
+  drawPoint(D, '#fbbf24', 4);
+  drawPoint(E, '#fbbf24', 4);
+  drawPoint(F, '#f87171', 4);
+  drawPoint(G, '#a78bfa', 4);
+  drawPoint(H, '#a78bfa', 4);
+
+  // Labels
+  drawLabel('A', A, 0, -18, '#38bdf8');
+  drawLabel('B', B, -18, 14, '#38bdf8');
+  drawLabel('C', C, 0, 18, '#38bdf8');
+  drawLabel('D', D, -20, -8, '#fbbf24');
+  drawLabel('E', E, 14, 12, '#fbbf24');
+  drawLabel('F', F, 6, 18, '#f87171');
+  drawLabel('G', G, -4, 18, '#a78bfa');
+  drawLabel('H', H, 4, 18, '#a78bfa');
+
+  // Tick marks
+  drawTickMark(B, D, 2, '#4ade80');
+  drawTickMark(C, E, 2, '#4ade80');
+}
+
+function drawStep3() {
+  clearCanvas();
+  // Highlight triangles BDG and CEH
+  drawTriangleFill(B, D, G, 'rgba(56,189,248,0.12)');
+  drawTriangleFill(C, E, H, 'rgba(251,146,60,0.12)');
+
+  // Base figure (lighter)
+  drawLine(A, B, '#334155', 1);
+  drawLine(A, C, '#334155', 1);
+  drawLine(B, C, '#38bdf8', 2);
+  drawLine(C, E, '#475569', 1, [6,4]);
+  drawLine(D, E, '#475569', 1);
+  drawLine(C, H, '#475569', 1.5, [4,4]);
+
+  // Triangle BDG edges
+  drawLine(B, D, '#38bdf8', 2.5);
+  drawLine(D, G, '#a78bfa', 2.5, [6,3]);
+  drawLine(B, G, '#38bdf8', 2);
+
+  // Triangle CEH edges
+  drawLine(C, E, '#fb923c', 2.5);
+  drawLine(E, H, '#a78bfa', 2.5, [6,3]);
+  drawLine(C, H, '#fb923c', 2);
+
+  // Right angle marks
+  drawRightAngle(G, {x:0, y:-1}, {x:1, y:0}, 10, '#a78bfa');
+  drawRightAngle(H, {x:0, y:-1}, {x:-1, y:0}, 10, '#a78bfa');
+
+  // Angle arcs
+  drawAngleArc(B, D, G, 24, '#38bdf8', 2);
+  // ∠HCE = β (vertical angle of ∠ACB)
+  drawAngleArc(C, H, E, 24, '#fb923c', 2);
+
+  drawLabel('β', B, 20, -10, '#38bdf8', 13);
+  drawLabel('β', C, 14, 10, '#fb923c', 13);
+
+  // Tick marks BD = CE
+  drawTickMark(B, D, 2, '#4ade80');
+  drawTickMark(C, E, 2, '#4ade80');
+
+  // Labels showing congruence result
+  drawTickMark(D, G, 3, '#e879f9');
+  drawTickMark(E, H, 3, '#e879f9');
+
+  // Points
+  drawPoint(A, '#475569', 3);
+  drawPoint(B, '#38bdf8', 4);
+  drawPoint(C, '#fb923c', 4);
+  drawPoint(D, '#38bdf8', 4);
+  drawPoint(E, '#fb923c', 4);
+  drawPoint(F, '#f87171', 3);
+  drawPoint(G, '#a78bfa', 4);
+  drawPoint(H, '#a78bfa', 4);
+
+  drawLabel('A', A, 0, -18, '#475569');
+  drawLabel('B', B, -18, 14, '#38bdf8');
+  drawLabel('C', C, 0, 18, '#38bdf8');
+  drawLabel('D', D, -20, -8, '#38bdf8');
+  drawLabel('E', E, 14, 12, '#fb923c');
+  drawLabel('F', F, 6, 18, '#f87171');
+  drawLabel('G', G, -4, 18, '#a78bfa');
+  drawLabel('H', H, 4, 18, '#a78bfa');
+
+  // Congruence symbol
+  drawLabel('Rt△BDG ≌ Rt△CEH', {x: 350, y: 490}, 0, 0, '#4ade80', 14);
+}
+
+function drawStep4() {
+  clearCanvas();
+  // Highlight triangles DGF and EHF
+  drawTriangleFill(D, G, F, 'rgba(74,222,128,0.15)');
+  drawTriangleFill(E, H, F, 'rgba(251,191,36,0.15)');
+
+  // Base figure (lighter)
+  drawLine(A, B, '#334155', 1);
+  drawLine(A, C, '#334155', 1);
+  drawLine(B, C, '#38bdf8', 1.5);
+  drawLine(C, H, '#475569', 1.5, [4,4]);
+
+  // DE full line
+  drawLine(D, E, '#475569', 1);
+
+  // DG and EH
+  drawLine(D, G, '#a78bfa', 2.5, [6,3]);
+  drawLine(E, H, '#a78bfa', 2.5, [6,3]);
+
+  // Triangle DGF
+  drawLine(D, G, '#4ade80', 2.5);
+  drawLine(G, F, '#4ade80', 2.5);
+  drawLine(D, F, '#4ade80', 2.5);
+
+  // Triangle EHF
+  drawLine(E, H, '#fbbf24', 2.5);
+  drawLine(H, F, '#fbbf24', 2.5);
+  drawLine(E, F, '#fbbf24', 2.5);
+
+  // Right angle marks
+  drawRightAngle(G, {x:0, y:-1}, {x:1, y:0}, 10, '#a78bfa');
+  drawRightAngle(H, {x:0, y:-1}, {x:-1, y:0}, 10, '#a78bfa');
+
+  // Vertical angles at F
+  drawAngleArc(F, D, G, 16, '#4ade80', 2);
+  drawAngleArc(F, E, H, 16, '#fbbf24', 2);
+
+  // DG = EH triple ticks
+  drawTickMark(D, G, 3, '#e879f9');
+  drawTickMark(E, H, 3, '#e879f9');
+
+  // Points
+  drawPoint(A, '#475569', 3);
+  drawPoint(B, '#38bdf8', 3);
+  drawPoint(C, '#38bdf8', 3);
+  drawPoint(D, '#4ade80', 4);
+  drawPoint(E, '#fbbf24', 4);
+  drawPoint(F, '#f87171', 5);
+  drawPoint(G, '#a78bfa', 4);
+  drawPoint(H, '#a78bfa', 4);
+
+  drawLabel('A', A, 0, -18, '#475569');
+  drawLabel('B', B, -18, 14, '#38bdf8');
+  drawLabel('C', C, 0, 18, '#38bdf8');
+  drawLabel('D', D, -20, -8, '#4ade80');
+  drawLabel('E', E, 14, 12, '#fbbf24');
+  drawLabel('F', F, 6, 18, '#f87171');
+  drawLabel('G', G, -4, 18, '#a78bfa');
+  drawLabel('H', H, 4, 18, '#a78bfa');
+
+  drawLabel('△DGF ≌ △EHF', {x: 350, y: 490}, 0, 0, '#4ade80', 14);
+}
+
+function drawStep5() {
+  clearCanvas();
+  // Full figure with DF = EF highlighted
+  drawLine(A, B, '#38bdf8', 1.5);
+  drawLine(A, C, '#38bdf8', 1.5);
+  drawLine(B, C, '#38bdf8', 2);
+  drawLine(C, E, '#38bdf8', 1.2, [6,4]);
+  drawLine(C, H, '#475569', 1, [4,4]);
+
+  // DG, EH
+  drawLine(D, G, '#a78bfa', 1.5, [6,3]);
+  drawLine(E, H, '#a78bfa', 1.5, [6,3]);
+
+  // DF and EF highlighted
+  drawLine(D, F, '#fbbf24', 3);
+  drawLine(E, F, '#fbbf24', 3);
+
+  // Tick marks on DF = EF
+  drawTickMark(D, F, 1, '#fbbf24');
+  drawTickMark(E, F, 1, '#fbbf24');
+
+  // Right angles
+  drawRightAngle(G, {x:0, y:-1}, {x:1, y:0}, 10, '#a78bfa');
+  drawRightAngle(H, {x:0, y:-1}, {x:-1, y:0}, 10, '#a78bfa');
+
+  // Points
+  drawPoint(A, '#38bdf8', 3);
+  drawPoint(B, '#38bdf8', 4);
+  drawPoint(C, '#38bdf8', 4);
+  drawPoint(D, '#fbbf24', 5);
+  drawPoint(E, '#fbbf24', 5);
+  drawPoint(F, '#f87171', 5);
+  drawPoint(G, '#a78bfa', 3);
+  drawPoint(H, '#a78bfa', 3);
+
+  drawLabel('A', A, 0, -18, '#38bdf8');
+  drawLabel('B', B, -18, 14, '#38bdf8');
+  drawLabel('C', C, 0, 18, '#38bdf8');
+  drawLabel('D', D, -20, -8, '#fbbf24');
+  drawLabel('E', E, 14, 12, '#fbbf24');
+  drawLabel('F', F, 6, 18, '#f87171');
+  drawLabel('G', G, -4, 18, '#a78bfa');
+  drawLabel('H', H, 4, 18, '#a78bfa');
+
+  drawTickMark(A, B, 1, '#4ade80');
+  drawTickMark(A, C, 1, '#4ade80');
+  drawTickMark(B, D, 2, '#4ade80');
+  drawTickMark(C, E, 2, '#4ade80');
+
+  // Conclusion
+  drawLabel('∴ DF = EF ✓', {x: 350, y: 490}, 0, 0, '#fbbf24', 16);
+}
+
+function drawStep6() {
+  clearCanvas();
+  // Show GH = BC relationship
+  drawLine(A, B, '#334155', 1);
+  drawLine(A, C, '#334155', 1);
+  drawLine(B, C, '#38bdf8', 2.5);
+  drawLine(C, E, '#475569', 1, [6,4]);
+  drawLine(D, E, '#475569', 1);
+
+  // BC extended to H
+  drawLine(C, H, '#38bdf8', 2, [4,4]);
+
+  // DG, EH
+  drawLine(D, G, '#a78bfa', 2, [6,3]);
+  drawLine(E, H, '#a78bfa', 2, [6,3]);
+
+  // Highlight GH segment
+  drawLine(G, H, '#fbbf24', 3.5);
+  // Highlight BC
+  // Draw BC a bit offset for visual clarity
+  drawLine(B, C, '#38bdf8', 2.5);
+
+  // GF and FH with tick marks (equal)
+  drawTickMark(G, F, 1, '#f87171');
+  drawTickMark(F, H, 1, '#f87171');
+
+  // BG and CH tick marks (equal from first congruence)
+  drawTickMark(B, G, 2, '#38bdf8');
+  drawTickMark(C, H, 2, '#38bdf8');
+
+  // Right angles
+  drawRightAngle(G, {x:0, y:-1}, {x:1, y:0}, 10, '#a78bfa');
+  drawRightAngle(H, {x:0, y:-1}, {x:-1, y:0}, 10, '#a78bfa');
+
+  // Brace-like annotation for GH = BC
+  const midGH_y = B.y + 40;
+  ctx.strokeStyle = '#fbbf24';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(G.x, B.y + 6); ctx.lineTo(G.x, midGH_y);
+  ctx.lineTo(H.x, midGH_y); ctx.lineTo(H.x, B.y + 6);
+  ctx.stroke();
+  drawLabel('GH', {x:(G.x+H.x)/2, y: midGH_y + 16}, 0, 0, '#fbbf24', 13);
+
+  const midBC_y = B.y - 26;
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(B.x, B.y - 6); ctx.lineTo(B.x, midBC_y);
+  ctx.lineTo(C.x, midBC_y); ctx.lineTo(C.x, B.y - 6);
+  ctx.stroke();
+  drawLabel('BC', {x:(B.x+C.x)/2, y: midBC_y - 14}, 0, 0, '#38bdf8', 13);
+
+  // Points
+  drawPoint(A, '#475569', 3);
+  drawPoint(B, '#38bdf8', 4);
+  drawPoint(C, '#38bdf8', 4);
+  drawPoint(D, '#fbbf24', 4);
+  drawPoint(E, '#fbbf24', 4);
+  drawPoint(F, '#f87171', 5);
+  drawPoint(G, '#a78bfa', 5);
+  drawPoint(H, '#a78bfa', 5);
+
+  drawLabel('A', A, 0, -18, '#475569');
+  drawLabel('B', B, -18, 6, '#38bdf8');
+  drawLabel('C', C, 12, 6, '#38bdf8');
+  drawLabel('D', D, -20, -8, '#fbbf24');
+  drawLabel('E', E, 14, 12, '#fbbf24');
+  drawLabel('F', F, 6, 18, '#f87171');
+  drawLabel('G', G, -4, 18, '#a78bfa');
+  drawLabel('H', H, 4, 18, '#a78bfa');
+
+  drawLabel('GH = GC + CH = (BC − BG) + BG = BC', {x: 350, y: 490}, 0, 0, '#4ade80', 13);
+}
+
+function drawStep7() {
+  clearCanvas();
+  // Full beautiful figure with all results
+  drawLine(A, B, '#38bdf8', 2);
+  drawLine(A, C, '#38bdf8', 2);
+  drawLine(B, C, '#38bdf8', 2.5);
+  drawLine(C, E, '#38bdf8', 1.5, [6,4]);
+  drawLine(C, H, '#475569', 1, [4,4]);
+
+  // DE
+  drawLine(D, F, '#fbbf24', 2.5);
+  drawLine(F, E, '#fbbf24', 2.5);
+
+  // DG, EH
+  drawLine(D, G, '#a78bfa', 2, [6,3]);
+  drawLine(E, H, '#a78bfa', 2, [6,3]);
+
+  // Right angles
+  drawRightAngle(G, {x:0, y:-1}, {x:1, y:0}, 10, '#a78bfa');
+  drawRightAngle(H, {x:0, y:-1}, {x:-1, y:0}, 10, '#a78bfa');
+
+  // Tick marks
+  drawTickMark(A, B, 1, '#4ade80');
+  drawTickMark(A, C, 1, '#4ade80');
+  drawTickMark(B, D, 2, '#4ade80');
+  drawTickMark(C, E, 2, '#4ade80');
+  drawTickMark(D, F, 1, '#fbbf24');
+  drawTickMark(E, F, 1, '#fbbf24');
+
+  // Angle arcs
+  drawAngleArc(B, A, C, 28, '#fb923c', 2);
+  drawAngleArc(C, B, A, 28, '#fb923c', 2);
+
+  // Points
+  drawPoint(A, '#38bdf8', 4);
+  drawPoint(B, '#38bdf8', 4);
+  drawPoint(C, '#38bdf8', 4);
+  drawPoint(D, '#fbbf24', 4);
+  drawPoint(E, '#fbbf24', 4);
+  drawPoint(F, '#f87171', 5);
+  drawPoint(G, '#a78bfa', 4);
+  drawPoint(H, '#a78bfa', 4);
+
+  drawLabel('A', A, 0, -18, '#38bdf8');
+  drawLabel('B', B, -18, 14, '#38bdf8');
+  drawLabel('C', C, 0, 18, '#38bdf8');
+  drawLabel('D', D, -20, -8, '#fbbf24');
+  drawLabel('E', E, 14, 12, '#fbbf24');
+  drawLabel('F', F, 6, 18, '#f87171');
+  drawLabel('G', G, -4, 18, '#a78bfa');
+  drawLabel('H', H, 4, 18, '#a78bfa');
+
+  // Big conclusion
+  drawLabel('DF = EF ✓   BC = 2FG ✓', {x: 350, y: 490}, 0, 0, '#4ade80', 15);
+}
+
+const drawFunctions = [null, drawStep1, drawStep2, drawStep3, drawStep4, drawStep5, drawStep6, drawStep7];
+
+// ==================== PROOF CONTENT ====================
+function getProofHTML(step) {
+  switch(step) {
+    case 1: return `
+      <div class="proof-step-title">📋 步骤一：审题与分析</div>
+      <div class="proof-block">
+        <h3>已知条件</h3>
+        <p>在 $\\triangle ABC$ 中：</p>
+        <p>① $AB = AC$（等腰三角形）</p>
+        <p>② 点 $D$ 在 $AB$ 边上</p>
+        <p>③ 点 $E$ 在 $AC$ 的延长线上</p>
+        <p>④ $CE = BD$</p>
+        <p>⑤ 连接 $DE$ 交 $BC$ 于点 $F$</p>
+      </div>
+      <div class="proof-block">
+        <h3>求证目标</h3>
+        <p><strong>(1)</strong> $EF = DF$</p>
+        <p><strong>(2)</strong> 过点 $D$ 作 $DG \\perp BC$，垂足为 $G$，求证 $BC = 2FG$</p>
+      </div>
+      <div class="proof-block highlight">
+        <span class="label label-green">关键观察</span>
+        <p>由 $AB = AC$ 可知 $\\angle ABC = \\angle ACB$（等腰三角形底角相等）。</p>
+        <p>设 $\\angle ABC = \\angle ACB = \\beta$。</p>
+        <p>$E$ 在 $AC$ 延长线上 $\\Rightarrow$ $\\angle ECB = 180° - \\beta$。</p>
+      </div>
+      <div class="note-text">
+        💡 本题的核心思路：构造辅助垂线，利用 <strong>两组全等三角形</strong> 完成证明。
+        纯初中方法，仅用全等三角形、对顶角、等腰三角形性质。
+      </div>
+    `;
+
+    case 2: return `
+      <div class="proof-step-title">🔧 步骤二：作辅助线</div>
+      <div class="proof-block">
+        <span class="label label-purple">辅助线构造</span>
+        <p>过点 $D$ 作 $DG \\perp BC$，垂足为 $G$（题目已给出）。</p>
+        <p>过点 $E$ 作 $EH \\perp BC$ 的延长线，垂足为 $H$。</p>
+        <p>（$H$ 在 $BC$ 延长线上，即 $C$ 的右侧）</p>
+      </div>
+      <div class="proof-block highlight">
+        <span class="label label-green">关键性质</span>
+        <p>因为 $DG \\perp BC$，$EH \\perp BC$（的延长线）：</p>
+        <p>$$DG \\parallel EH$$</p>
+        <p>（同垂直于一条直线的两条线段互相平行）</p>
+      </div>
+      <div class="proof-block">
+        <span class="label label-orange">证明思路预览</span>
+        <p>接下来分两步：</p>
+        <p>① 先证 $\\text{Rt}\\triangle BDG \\cong \\text{Rt}\\triangle CEH$，得到 $DG = EH$</p>
+        <p>② 再证 $\\triangle DGF \\cong \\triangle EHF$，得到 $DF = EF$</p>
+      </div>
+      <div class="note-text">
+        💡 这两条垂线是整个证明的核心辅助线！$D$ 和 $E$ 到直线 $BC$ 的距离相等——这就是突破口。
+      </div>
+    `;
+
+    case 3: return `
+      <div class="proof-step-title">🔺 步骤三：第一组全等 — Rt△BDG ≌ Rt△CEH</div>
+      <div class="proof-block">
+        <span class="label label-blue">角度分析</span>
+        <p>在 $\\text{Rt}\\triangle BDG$ 中：</p>
+        <p>$\\angle DGB = 90°$，$\\angle DBG = \\angle ABC = \\beta$</p>
+        <p style="margin-top:8px;">在 $\\text{Rt}\\triangle CEH$ 中：</p>
+        <p>$\\angle EHC = 90°$</p>
+        <p>因为 $E$ 在 $AC$ 延长线上，$H$ 在 $BC$ 延长线上，</p>
+        <p>所以 $\\angle HCE$ 与 $\\angle ACB$ 是<strong>对顶角</strong>：</p>
+        <p>$$\\angle HCE = \\angle ACB = \\beta$$</p>
+      </div>
+      <div class="proof-block highlight">
+        <span class="label label-green">全等证明（AAS）</span>
+        <p>在 $\\text{Rt}\\triangle BDG$ 和 $\\text{Rt}\\triangle CEH$ 中：</p>
+        <p>$$\\begin{cases} \\angle DGB = \\angle EHC = 90° \\\\ \\angle DBG = \\angle HCE = \\beta \\\\ BD = CE \\ (\\text{已知}) \\end{cases}$$</p>
+        <p>$$\\therefore \\text{Rt}\\triangle BDG \\cong \\text{Rt}\\triangle CEH \\quad (\\text{AAS})$$</p>
+      </div>
+      <div class="proof-block conclusion">
+        <span class="label label-yellow">全等结论</span>
+        <p>$$DG = EH \\quad (\\text{全等三角形对应边相等})$$</p>
+        <p>$$BG = CH \\quad (\\text{全等三角形对应边相等})$$</p>
+      </div>
+      <div class="note-text">
+        💡 对顶角 $\\angle HCE = \\angle ACB$ 是关键！$AC$ 和 $CE$ 共线，$BC$ 和 $CH$ 共线，交于 $C$，所以 $\\angle HCE$ 和 $\\angle ACB$ 是对顶角。
+      </div>
+    `;
+
+    case 4: return `
+      <div class="proof-step-title">🔺 步骤四：第二组全等 — △DGF ≌ △EHF</div>
+      <div class="proof-block">
+        <span class="label label-blue">条件梳理</span>
+        <p>在 $\\triangle DGF$ 和 $\\triangle EHF$ 中：</p>
+        <p>① $\\angle DGF = \\angle EHF = 90°$</p>
+        <p style="margin-left:20px; color:#94a3b8;">（$DG \\perp BC$，$EH \\perp BC$ 延长线）</p>
+        <p>② $\\angle DFG = \\angle EFH$</p>
+        <p style="margin-left:20px; color:#94a3b8;">（对顶角相等）</p>
+        <p>③ $DG = EH$</p>
+        <p style="margin-left:20px; color:#94a3b8;">（由步骤三全等得到）</p>
+      </div>
+      <div class="proof-block highlight">
+        <span class="label label-green">全等证明（AAS）</span>
+        <p>$$\\begin{cases} \\angle DGF = \\angle EHF = 90° \\\\ \\angle DFG = \\angle EFH \\ (\\text{对顶角}) \\\\ DG = EH \\ (\\text{已证}) \\end{cases}$$</p>
+        <p>$$\\therefore \\triangle DGF \\cong \\triangle EHF \\quad (\\text{AAS})$$</p>
+      </div>
+      <div class="proof-block conclusion">
+        <span class="label label-yellow">全等结论</span>
+        <p>$$DF = EF \\quad (\\text{全等三角形对应边相等})$$</p>
+        <p>$$GF = HF \\quad (\\text{全等三角形对应边相等})$$</p>
+        <p style="margin-top:6px; color: #94a3b8;">（$GF = HF$ 说明 $F$ 是线段 $GH$ 的中点）</p>
+      </div>
+    `;
+
+    case 5: return `
+      <div class="proof-step-title">✅ 步骤五：第(1)问证毕 — EF = DF</div>
+      <div class="proof-block conclusion">
+        <span class="label label-yellow">完整证明过程</span>
+        <h3>第(1)问：证明 $EF = DF$</h3>
+        <p><strong>证明：</strong></p>
+        <p>过点 $E$ 作 $EH \\perp BC$ 延长线于 $H$。</p>
+        <p style="margin-top:6px;">$\\because AB = AC$，$\\therefore \\angle ABC = \\angle ACB$（等腰三角形底角相等）</p>
+        <p>$\\because$ $E$ 在 $AC$ 延长线上，$H$ 在 $BC$ 延长线上</p>
+        <p>$\\therefore \\angle HCE = \\angle ACB$（对顶角相等）</p>
+        <p>$\\therefore \\angle DBG = \\angle HCE$</p>
+        <p style="margin-top:6px;">在 $\\text{Rt}\\triangle BDG$ 和 $\\text{Rt}\\triangle CEH$ 中：</p>
+        <p>$\\angle DGB = \\angle EHC = 90°$，$\\angle DBG = \\angle HCE$，$BD = CE$</p>
+        <p>$\\therefore \\text{Rt}\\triangle BDG \\cong \\text{Rt}\\triangle CEH$（AAS）</p>
+        <p>$\\therefore DG = EH$</p>
+        <p style="margin-top:6px;">在 $\\triangle DGF$ 和 $\\triangle EHF$ 中：</p>
+        <p>$\\angle DGF = \\angle EHF = 90°$，$\\angle DFG = \\angle EFH$（对顶角），$DG = EH$</p>
+        <p>$\\therefore \\triangle DGF \\cong \\triangle EHF$（AAS）</p>
+        <p style="margin-top:8px; font-size:15px;">$$\\therefore DF = EF \\qquad \\blacksquare$$</p>
+      </div>
+      <div class="note-text">
+        💡 证明核心链条：等腰 → 底角相等 → 对顶角 → 第一组全等(AAS) → DG=EH → 第二组全等(AAS) → DF=EF
+      </div>
+    `;
+
+    case 6: return `
+      <div class="proof-step-title">✅ 步骤六：第(2)问 — 证明 BC = 2FG</div>
+      <div class="proof-block">
+        <span class="label label-blue">已有结论回顾</span>
+        <p>由步骤三：$\\text{Rt}\\triangle BDG \\cong \\text{Rt}\\triangle CEH \\Rightarrow BG = CH$</p>
+        <p>由步骤四：$\\triangle DGF \\cong \\triangle EHF \\Rightarrow GF = HF$</p>
+      </div>
+      <div class="proof-block highlight">
+        <span class="label label-green">关键步骤：证明 GH = BC</span>
+        <p>$G$ 在线段 $BC$ 上，$H$ 在 $BC$ 延长线上（$C$ 的右侧），</p>
+        <p>$$GH = GC + CH$$</p>
+        <p>$\\because G$ 在 $BC$ 上，$\\therefore BG + GC = BC$</p>
+        <p>$\\therefore GC = BC - BG$</p>
+        <p>$\\therefore GH = (BC - BG) + CH$</p>
+        <p>$\\because BG = CH$（已证）</p>
+        <p>$$\\therefore GH = BC - BG + BG = BC$$</p>
+      </div>
+      <div class="proof-block conclusion">
+        <span class="label label-yellow">最终结论</span>
+        <p>$\\because GF = HF$（已证），即 $F$ 是 $GH$ 的中点</p>
+        <p>$$\\therefore FG = \\frac{1}{2} GH = \\frac{1}{2} BC$$</p>
+        <p style="margin-top:8px; font-size:15px;">$$\\therefore BC = 2FG \\qquad \\blacksquare$$</p>
+      </div>
+      <div class="proof-block">
+        <span class="label label-orange">证明逻辑总结</span>
+        <p>第一组全等 $\\Rightarrow BG = CH \\Rightarrow GH = BC$</p>
+        <p>第二组全等 $\\Rightarrow GF = HF \\Rightarrow F$ 是 $GH$ 中点</p>
+        <p>两者结合 $\\Rightarrow FG = BC/2 \\Rightarrow BC = 2FG$</p>
+      </div>
+    `;
+
+    case 7: return `
+      <div class="proof-step-title">🎯 步骤七：总结</div>
+      <div class="proof-block conclusion">
+        <span class="label label-yellow">证明方法总结</span>
+        <h3>核心思想：两组全等三角形</h3>
+        <p style="margin-top:10px;"><strong>辅助线：</strong>过 $E$ 作 $EH \\perp BC$ 延长线于 $H$</p>
+        <p style="margin-top:10px;"><strong>第一组全等：</strong></p>
+        <p>$\\text{Rt}\\triangle BDG \\cong \\text{Rt}\\triangle CEH$（AAS）</p>
+        <p>→ 得到 $DG = EH$，$BG = CH$</p>
+        <p style="margin-top:10px;"><strong>第二组全等：</strong></p>
+        <p>$\\triangle DGF \\cong \\triangle EHF$（AAS）</p>
+        <p>→ 得到 $DF = EF$，$GF = HF$</p>
+      </div>
+      <div class="proof-block highlight">
+        <span class="label label-green">最终结论</span>
+        <p style="font-size:16px; text-align:center; padding: 10px 0;">
+          $\\boxed{DF = EF}$ &nbsp;&nbsp;&nbsp; $\\boxed{BC = 2FG}$
+        </p>
+      </div>
+      <div class="proof-block">
+        <span class="label label-purple">知识点清单</span>
+        <p>✅ 等腰三角形底角相等</p>
+        <p>✅ 对顶角相等</p>
+        <p>✅ 全等三角形判定（AAS）</p>
+        <p>✅ 全等三角形对应边相等</p>
+        <p>✅ 垂直于同一直线的两条线段平行</p>
+        <p>✅ 线段中点性质</p>
+      </div>
+      <div class="proof-block">
+        <span class="label label-orange">解题经验</span>
+        <p>🔑 <strong>辅助线技巧：</strong>当题目给出一条垂线时（$DG \\perp BC$），考虑对称地作另一条垂线（$EH \\perp BC$）。</p>
+        <p>🔑 <strong>对顶角的应用：</strong>$E$ 在 $AC$ 延长线上，$H$ 在 $BC$ 延长线上，则 $\\angle HCE = \\angle ACB$（对顶角）——这是构建全等的关键桥梁。</p>
+        <p>🔑 <strong>"一题两全等"模式：</strong>第一组全等提供中间结论（$DG=EH$, $BG=CH$），第二组全等给出最终结果。</p>
+      </div>
+    `;
+  }
+}
+
+// ==================== NAVIGATION ====================
+let currentStep = 1;
+const totalSteps = 7;
+const stepBtns = document.querySelectorAll('.step-btn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const stepIndicator = document.getElementById('stepIndicator');
+const proofPanel = document.getElementById('proofPanel');
+
+function goToStep(n) {
+  if (n < 1 || n > totalSteps) return;
+  currentStep = n;
+
+  // Update step buttons
+  stepBtns.forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (i + 1 < n) btn.classList.add('completed');
+    if (i + 1 === n) { btn.classList.add('active'); btn.classList.remove('completed'); }
+    if (i + 1 > n) btn.classList.remove('completed');
+  });
+
+  // Update nav buttons
+  prevBtn.disabled = (n === 1);
+  nextBtn.disabled = (n === totalSteps);
+  nextBtn.textContent = (n === totalSteps) ? '已完成 ✓' : '下一步 ▶';
+  stepIndicator.textContent = `步骤 ${n} / ${totalSteps}`;
+
+  // Draw canvas
+  drawFunctions[n]();
+
+  // Update proof panel
+  proofPanel.innerHTML = getProofHTML(n);
+  proofPanel.scrollTop = 0;
+
+  // Re-render KaTeX
+  renderMathInElement(proofPanel, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  });
+}
+
+// Event listeners
+stepBtns.forEach(btn => {
+  btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.step)));
+});
+prevBtn.addEventListener('click', () => goToStep(currentStep - 1));
+nextBtn.addEventListener('click', () => goToStep(currentStep + 1));
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goToStep(currentStep - 1); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goToStep(currentStep + 1); }
+});
+
+// Initialize
+goToStep(1);
+</script>
+</body>
+</html>

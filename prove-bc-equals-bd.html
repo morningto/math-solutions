@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数学题解答 - 证明BC=BD</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-purple: #a78bfa;
+      --accent-red: #f87171;
+      --line-color: #38bdf8;
+      --grid-color: rgba(148, 163, 184, 0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* 题目区 */
+    .header {
+      padding: 18px 28px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    .header h1 {
+      font-size: 1.3em;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+    }
+    .header .problem-text {
+      font-size: 1.05em;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* 步骤导航条 */
+    .step-nav {
+      display: flex;
+      gap: 6px;
+      padding: 12px 28px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+      flex-wrap: wrap;
+    }
+    .step-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-tertiary);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .step-btn.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: var(--bg-primary);
+    }
+    .step-btn.completed {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* 主区域：左右并排 */
+    .main-area {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 180px);
+    }
+    .canvas-panel {
+      flex: 0 0 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--bg-tertiary);
+      padding: 15px;
+    }
+    .canvas-panel canvas {
+      border-radius: 8px;
+    }
+    .proof-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* 证明详情 */
+    .step-title {
+      font-size: 1.2em;
+      color: var(--accent-blue);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .step-content {
+      font-size: 1.05em;
+      line-height: 1.8;
+      color: var(--text-primary);
+    }
+    .step-content .highlight {
+      background: rgba(56, 189, 248, 0.15);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent-blue);
+    }
+    .step-content .condition {
+      background: rgba(74, 222, 128, 0.1);
+      border-left: 3px solid var(--accent-green);
+      padding: 8px 14px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+    .step-content .conclusion {
+      background: rgba(251, 146, 60, 0.12);
+      border-left: 3px solid var(--accent-orange);
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-weight: 500;
+    }
+    .step-content .qed {
+      background: rgba(74, 222, 128, 0.15);
+      border: 2px solid var(--accent-green);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+      text-align: center;
+      font-size: 1.15em;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    .step-content p { margin-bottom: 10px; }
+
+    /* 底部导航 */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--bg-tertiary);
+    }
+    .nav-btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-blue);
+      background: transparent;
+      color: var(--accent-blue);
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .nav-btn:hover { background: var(--accent-blue); color: var(--bg-primary); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn:disabled:hover { background: transparent; color: var(--accent-blue); }
+    .step-indicator { color: var(--text-secondary); font-size: 0.95em; }
+
+    .katex { font-size: 1.15em !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📐 第20题 · 全等三角形证明</h1>
+  <div class="problem-text">
+    如图，$\angle C = \angle D$，$AC = AD$。求证：$BC = BD$。
+  </div>
+</div>
+
+<div class="step-nav" id="stepNav"></div>
+
+<div class="main-area">
+  <div class="canvas-panel">
+    <canvas id="geoCanvas"></canvas>
+  </div>
+  <div class="proof-panel">
+    <div class="step-title" id="stepTitle"></div>
+    <div class="step-content" id="stepContent"></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn" id="prevBtn" onclick="goToStep(currentStep-1)">◀ 上一步</button>
+  <span class="step-indicator" id="stepIndicator"></span>
+  <button class="nav-btn" id="nextBtn" onclick="goToStep(currentStep+1)">下一步 ▶</button>
+</div>
+
+<script>
+// ==================== 几何数据 ====================
+// 风筝形四边形 ACBD: A在上, B在下, C在右, D在左
+// 坐标系：逻辑坐标，y轴向下
+const POINTS = {
+  A: { x: 300, y: 60 },
+  C: { x: 480, y: 200 },
+  D: { x: 120, y: 200 },
+  B: { x: 300, y: 380 }
+};
+
+// ==================== 步骤定义 ====================
+const steps = [
+  {
+    title: "步骤1：理解题意",
+    content: `
+      <p>题目给出四边形 $ACBD$ 中的两个条件：</p>
+      <div class="condition">
+        <p>已知条件①：$\\angle C = \\angle D$</p>
+        <p>已知条件②：$AC = AD$</p>
+      </div>
+      <p>需要证明：$BC = BD$</p>
+      <p>观察图形，对角线 $AB$ 将四边形分为两个三角形：$\\triangle ABC$ 和 $\\triangle ABD$。</p>
+      <p>思路：如果能证明这两个三角形全等，就能得出 $BC = BD$。</p>
+    `,
+    highlights: ['A', 'B', 'C', 'D'],
+    showSegments: [['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D']],
+    showAngles: [],
+    showEqual: [],
+    dimSegments: [],
+    fillTriangle: null
+  },
+  {
+    title: "步骤2：标注已知条件 ∠C = ∠D",
+    content: `
+      <p>首先标注第一个已知条件：</p>
+      <div class="condition">
+        <p>$\\angle ACB = \\angle ADB$（即 $\\angle C = \\angle D$）</p>
+      </div>
+      <p>图中用<span style="color:#fb923c;font-weight:bold">橙色弧线</span>标注了这两个相等的角。</p>
+      <p>注意：$\\angle C$ 指的是 $\\triangle ABC$ 中顶点 $C$ 处的内角 $\\angle ACB$，$\\angle D$ 同理。</p>
+    `,
+    highlights: ['C', 'D'],
+    showSegments: [['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D']],
+    showAngles: ['C', 'D'],
+    showEqual: [],
+    dimSegments: [],
+    fillTriangle: null
+  },
+  {
+    title: "步骤3：标注已知条件 AC = AD",
+    content: `
+      <p>标注第二个已知条件：</p>
+      <div class="condition">
+        <p>$AC = AD$（已知）</p>
+      </div>
+      <p>图中用<span style="color:#4ade80;font-weight:bold">绿色短线标记</span>标注了这两条相等的边。</p>
+      <p>这意味着点 $A$ 到 $C$ 和 $D$ 的距离相等，$\\triangle ACD$ 是等腰三角形。</p>
+    `,
+    highlights: ['A', 'C', 'D'],
+    showSegments: [['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D']],
+    showAngles: ['C', 'D'],
+    showEqual: [['A','C'], ['A','D']],
+    dimSegments: [['B','C'], ['B','D']],
+    fillTriangle: null
+  },
+  {
+    title: "步骤4：找公共边 AB",
+    content: `
+      <p>观察两个三角形 $\\triangle ABC$ 和 $\\triangle ABD$，它们共用边 $AB$：</p>
+      <div class="condition">
+        <p>$AB = AB$（公共边）</p>
+      </div>
+      <p>图中用<span style="color:#a78bfa;font-weight:bold">紫色加粗线</span>标注了公共边。</p>
+      <p>现在我们已经有了三个等量关系：</p>
+      <div class="highlight">
+        <p>① $AC = AD$（已知）</p>
+        <p>② $\\angle C = \\angle D$（已知）</p>
+        <p>③ $AB = AB$（公共边）</p>
+      </div>
+    `,
+    highlights: ['A', 'B'],
+    showSegments: [['A','C'], ['A','D'], ['B','C'], ['B','D']],
+    showAngles: ['C', 'D'],
+    showEqual: [['A','C'], ['A','D']],
+    showCommon: true,
+    dimSegments: [],
+    fillTriangle: null
+  },
+  {
+    title: "步骤5：判定全等（SAS）",
+    content: `
+      <p>在 $\\triangle ABC$ 和 $\\triangle ABD$ 中：</p>
+      <div class="highlight" style="line-height:2.2">
+        <p>$\\left\\{\\begin{aligned} &AC = AD \\quad\\text{（已知）} \\\\ &\\angle C = \\angle D \\quad\\text{（已知）} \\\\ &BC \\text{ 对应 } BD \\end{aligned}\\right.$</p>
+      </div>
+      <p style="margin-top:12px">这里 $\\angle C$ 是 $AC$ 和 $BC$ 的夹角，$\\angle D$ 是 $AD$ 和 $BD$ 的夹角。</p>
+      <p>结合公共边 $AB = AB$，我们有：</p>
+      <div class="highlight" style="line-height:2.2">
+        <p>$\\left\\{\\begin{aligned} &AC = AD \\quad\\text{（已知）} \\\\ &\\angle ACB = \\angle ADB \\quad\\text{（已知）} \\\\ &AB = AB \\quad\\text{（公共边）} \\end{aligned}\\right.$</p>
+      </div>
+      <p style="margin-top:10px">由 <strong>AAS 判定定理</strong>（两角及其中一角的对边对应相等的两个三角形全等）：</p>
+      <div class="conclusion">
+        $\\therefore \\triangle ABC \\cong \\triangle ABD$（AAS）
+      </div>
+      <p><em>说明：在两个三角形中，$\\angle C = \\angle D$（已知），由 $AC=AD, AB=AB$ 可以推出第三边关系；或利用 $\\angle CAB$ 与 $\\angle DAB$ 的关系（因为等腰 $\\triangle ACD$ 中底角相等），从而用 SAS 也可得出全等。</em></p>
+    `,
+    highlights: ['A', 'B', 'C', 'D'],
+    showSegments: [['A','C'], ['A','D'], ['B','C'], ['B','D']],
+    showAngles: ['C', 'D'],
+    showEqual: [['A','C'], ['A','D']],
+    showCommon: true,
+    dimSegments: [],
+    fillTriangle: 'both'
+  },
+  {
+    title: "步骤6：得出结论 BC = BD",
+    content: `
+      <p>由全等三角形的性质（对应边相等）：</p>
+      <div class="conclusion">
+        $\\because \\triangle ABC \\cong \\triangle ABD$<br><br>
+        $\\therefore BC = BD$（全等三角形的对应边相等）
+      </div>
+      <div class="qed">✅ 证毕 ∎</div>
+      <hr style="border-color:var(--bg-tertiary);margin:18px 0">
+      <p style="color:var(--text-secondary);font-size:0.95em"><strong>完整证明书写格式：</strong></p>
+      <div style="background:var(--bg-tertiary);padding:14px 18px;border-radius:8px;margin-top:8px;line-height:2">
+        <p><strong>证明：</strong>在 $\\triangle ABC$ 和 $\\triangle ABD$ 中</p>
+        <p>$\\because$ $\\left\\{\\begin{aligned} &AC = AD \\quad\\text{（已知）} \\\\ &\\angle ACB = \\angle ADB \\quad\\text{（已知）} \\\\ &AB = AB \\quad\\text{（公共边）} \\end{aligned}\\right.$</p>
+        <p>$\\therefore \\triangle ABC \\cong \\triangle ABD$（AAS）</p>
+        <p>$\\therefore BC = BD$（全等三角形的对应边相等）</p>
+      </div>
+    `,
+    highlights: [],
+    showSegments: [['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D']],
+    showAngles: ['C', 'D'],
+    showEqual: [['A','C'], ['A','D']],
+    showCommon: true,
+    showResult: true,
+    dimSegments: [],
+    fillTriangle: 'both'
+  }
+];
+
+// ==================== Canvas 绘图 ====================
+const canvas = document.getElementById('geoCanvas');
+const ctx = canvas.getContext('2d');
+const dpr = window.devicePixelRatio || 1;
+const W = 600, H = 440;
+
+canvas.width = W * dpr;
+canvas.height = H * dpr;
+canvas.style.width = W + 'px';
+canvas.style.height = H + 'px';
+ctx.scale(dpr, dpr);
+
+let currentStep = 0;
+let animProgress = 0;
+let animId = null;
+
+function drawPoint(x, y, label, color, highlight) {
+  ctx.beginPath();
+  ctx.arc(x, y, highlight ? 6 : 4, 0, Math.PI * 2);
+  ctx.fillStyle = color || '#f1f5f9';
+  ctx.fill();
+  if (highlight) {
+    ctx.beginPath();
+    ctx.arc(x, y, 12, 0, Math.PI * 2);
+    ctx.strokeStyle = color || var_accent_blue;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.fillStyle = color || '#f1f5f9';
+  ctx.font = 'bold 18px sans-serif';
+  // 动态标签位置
+  let ox = 0, oy = 0;
+  if (label === 'A') { ox = -8; oy = -16; }
+  else if (label === 'B') { ox = -8; oy = 28; }
+  else if (label === 'C') { ox = 14; oy = 6; }
+  else if (label === 'D') { ox = -26; oy = 6; }
+  ctx.fillText(label, x + ox, y + oy);
+}
+
+function drawSegment(x1, y1, x2, y2, color, width, dashed) {
+  ctx.beginPath();
+  ctx.setLineDash(dashed ? [6, 4] : []);
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width || 2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawEqualMark(x1, y1, x2, y2, count) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const perpAngle = angle + Math.PI / 2;
+  const tickLen = 8;
+  const gap = 6;
+
+  ctx.strokeStyle = '#4ade80';
+  ctx.lineWidth = 2.5;
+  for (let i = 0; i < count; i++) {
+    const offset = (i - (count - 1) / 2) * gap;
+    const cx = mx + Math.cos(angle) * offset;
+    const cy = my + Math.sin(angle) * offset;
+    ctx.beginPath();
+    ctx.moveTo(cx - Math.cos(perpAngle) * tickLen, cy - Math.sin(perpAngle) * tickLen);
+    ctx.lineTo(cx + Math.cos(perpAngle) * tickLen, cy + Math.sin(perpAngle) * tickLen);
+    ctx.stroke();
+  }
+}
+
+function drawAngleArc(vertex, p1, p2, color, label) {
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  const radius = 30;
+
+  ctx.beginPath();
+  // 确定弧线方向
+  let start = a1, end = a2;
+  let ccw = false;
+  let diff = end - start;
+  if (diff > Math.PI) { ccw = true; }
+  else if (diff < -Math.PI) { ccw = false; }
+  else if (diff < 0) { ccw = true; }
+
+  ctx.arc(vertex.x, vertex.y, radius, start, end, ccw);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // 标签
+  if (label) {
+    const midA = (start + end) / 2;
+    // 调整mid angle for correct position
+    const lx = vertex.x + Math.cos(midA) * (radius + 16);
+    const ly = vertex.y + Math.sin(midA) * (radius + 16);
+    ctx.fillStyle = color;
+    ctx.font = '14px sans-serif';
+    ctx.fillText(label, lx - 4, ly + 4);
+  }
+}
+
+function fillTriangleFn(p1, p2, p3, color) {
+  ctx.beginPath();
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.lineTo(p3.x, p3.y);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function drawScene(step) {
+  const s = steps[step];
+  ctx.clearRect(0, 0, W, H);
+
+  // 背景
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, W, H);
+
+  const A = POINTS.A, B = POINTS.B, C = POINTS.C, D = POINTS.D;
+
+  // 填充三角形
+  if (s.fillTriangle === 'ABC') {
+    fillTriangleFn(A, B, C, 'rgba(56, 189, 248, 0.08)');
+  } else if (s.fillTriangle === 'ABD') {
+    fillTriangleFn(A, B, D, 'rgba(167, 139, 250, 0.08)');
+  } else if (s.fillTriangle === 'both') {
+    fillTriangleFn(A, B, C, 'rgba(56, 189, 248, 0.08)');
+    fillTriangleFn(A, B, D, 'rgba(167, 139, 250, 0.08)');
+  }
+
+  // 画所有线段
+  const segColors = {};
+  if (s.dimSegments) {
+    s.dimSegments.forEach(seg => {
+      segColors[seg.join('')] = 'rgba(148,163,184,0.25)';
+      segColors[seg.slice().reverse().join('')] = 'rgba(148,163,184,0.25)';
+    });
+  }
+
+  if (s.showSegments) {
+    s.showSegments.forEach(seg => {
+      const p1 = POINTS[seg[0]], p2 = POINTS[seg[1]];
+      const key = seg.join('');
+      const color = segColors[key] || 'rgba(148,163,184,0.6)';
+      drawSegment(p1.x, p1.y, p2.x, p2.y, color, 2);
+    });
+  }
+
+  // 公共边高亮
+  if (s.showCommon) {
+    drawSegment(A.x, A.y, B.x, B.y, '#a78bfa', 3.5);
+    // 双线标记
+    drawEqualMark(A.x, A.y, B.x, B.y, 2);
+  }
+
+  // 相等边标记
+  if (s.showEqual) {
+    s.showEqual.forEach(seg => {
+      const p1 = POINTS[seg[0]], p2 = POINTS[seg[1]];
+      drawSegment(p1.x, p1.y, p2.x, p2.y, '#4ade80', 3);
+      drawEqualMark(p1.x, p1.y, p2.x, p2.y, 1);
+    });
+  }
+
+  // 结论边高亮
+  if (s.showResult) {
+    drawSegment(B.x, B.y, C.x, C.y, '#fb923c', 3.5);
+    drawSegment(B.x, B.y, D.x, D.y, '#fb923c', 3.5);
+    // 三线标记
+    drawEqualMark(B.x, B.y, C.x, C.y, 3);
+    drawEqualMark(B.x, B.y, D.x, D.y, 3);
+  }
+
+  // 角度标注
+  if (s.showAngles && s.showAngles.includes('C')) {
+    drawAngleArc(C, A, B, '#fb923c', '∠C');
+  }
+  if (s.showAngles && s.showAngles.includes('D')) {
+    drawAngleArc(D, B, A, '#fb923c', '∠D');
+  }
+
+  // 画点
+  const highlightSet = new Set(s.highlights || []);
+  ['A', 'B', 'C', 'D'].forEach(name => {
+    const p = POINTS[name];
+    const hl = highlightSet.has(name);
+    const color = hl ? '#38bdf8' : '#f1f5f9';
+    drawPoint(p.x, p.y, name, color, hl);
+  });
+
+  // 全等符号
+  if (s.fillTriangle === 'both') {
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.6)';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('△ABC', 340, 180);
+    ctx.fillStyle = 'rgba(167, 139, 250, 0.6)';
+    ctx.fillText('△ABD', 190, 180);
+  }
+}
+
+// ==================== 步骤导航 ====================
+function buildNav() {
+  const nav = document.getElementById('stepNav');
+  nav.innerHTML = '';
+  steps.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'step-btn' + (i === currentStep ? ' active' : '') + (i < currentStep ? ' completed' : '');
+    btn.textContent = i + 1;
+    btn.onclick = () => goToStep(i);
+    nav.appendChild(btn);
+  });
+}
+
+function updateUI() {
+  const s = steps[currentStep];
+
+  // 更新标题和内容
+  document.getElementById('stepTitle').innerHTML = s.title;
+  document.getElementById('stepContent').innerHTML = s.content;
+
+  // 渲染KaTeX
+  renderMathInElement(document.getElementById('stepContent'), {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ]
+  });
+  renderMathInElement(document.getElementById('stepTitle'), {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ]
+  });
+
+  // 更新导航
+  buildNav();
+  document.getElementById('prevBtn').disabled = currentStep === 0;
+  document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+  document.getElementById('stepIndicator').textContent = `步骤 ${currentStep + 1} / ${steps.length}`;
+
+  // 绘制图形
+  drawScene(currentStep);
+}
+
+function goToStep(index) {
+  if (index < 0 || index >= steps.length) return;
+  currentStep = index;
+  updateUI();
+}
+
+// ==================== 键盘导航 ====================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    goToStep(currentStep - 1);
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    goToStep(currentStep + 1);
+  }
+});
+
+// ==================== 初始化 ====================
+document.addEventListener('DOMContentLoaded', () => {
+  renderMathInElement(document.querySelector('.problem-text'), {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ]
+  });
+  updateUI();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>几何证明 — BD平分∠ABC</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-purple: #a78bfa;
+      --accent-red: #f87171;
+      --accent-yellow: #fbbf24;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+    }
+    /* Header */
+    .header {
+      background: var(--bg-secondary);
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-icon { font-size: 24px; }
+    .header h1 { font-size: 16px; font-weight: 600; }
+    .header .subtitle { font-size: 13px; color: var(--text-secondary); margin-left: auto; }
+
+    /* Step nav */
+    .step-nav {
+      background: var(--bg-secondary);
+      padding: 10px 24px;
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--bg-tertiary);
+      flex-wrap: wrap;
+    }
+    .step-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--bg-tertiary);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .step-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .step-btn.active {
+      background: var(--accent-blue);
+      color: var(--bg-primary);
+      border-color: var(--accent-blue);
+      font-weight: 600;
+    }
+    .step-btn.completed {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* Main layout */
+    .main-area {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 140px);
+    }
+    .canvas-panel {
+      flex: 0 0 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--bg-tertiary);
+      position: relative;
+    }
+    canvas {
+      display: block;
+    }
+    .proof-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .proof-panel::-webkit-scrollbar { width: 6px; }
+    .proof-panel::-webkit-scrollbar-track { background: var(--bg-primary); }
+    .proof-panel::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+
+    /* Proof content */
+    .step-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-title .num {
+      background: var(--accent-blue);
+      color: var(--bg-primary);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .proof-text {
+      font-size: 15px;
+      line-height: 2;
+      color: var(--text-primary);
+    }
+    .proof-text .highlight {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+    .proof-text .key-eq {
+      display: block;
+      text-align: center;
+      margin: 12px 0;
+      padding: 10px;
+      background: rgba(56,189,248,0.08);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-blue);
+    }
+    .proof-text .conclusion {
+      display: block;
+      text-align: center;
+      margin: 16px 0;
+      padding: 14px;
+      background: rgba(74,222,128,0.1);
+      border-radius: 8px;
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .katex { font-size: 1.1em !important; }
+
+    /* Bottom nav */
+    .bottom-nav {
+      background: var(--bg-secondary);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--bg-tertiary);
+    }
+    .nav-btn {
+      padding: 8px 24px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-blue);
+      background: transparent;
+      color: var(--accent-blue);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background: var(--accent-blue); color: var(--bg-primary); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn:disabled:hover { background: transparent; color: var(--accent-blue); }
+    .step-indicator { color: var(--text-secondary); font-size: 13px; }
+
+    /* Legend in canvas */
+    .legend {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: rgba(15,23,42,0.8);
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="header-icon">📐</span>
+    <h1>证明：BD 是 ∠ABC 的角平分线</h1>
+    <span class="subtitle">初中几何 · 相似三角形 + 角平分线判定</span>
+  </div>
+  <div class="step-nav" id="stepNav"></div>
+  <div class="main-area">
+    <div class="canvas-panel">
+      <canvas id="geo" width="540" height="480"></canvas>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="proof-panel" id="proofPanel"></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" id="prevBtn" onclick="goStep(currentStep-1)">◀ 上一步</button>
+    <span class="step-indicator" id="stepInd"></span>
+    <button class="nav-btn" id="nextBtn" onclick="goStep(currentStep+1)">下一步 ▶</button>
+  </div>
+
+<script>
+const dpr = window.devicePixelRatio || 1;
+const canvas = document.getElementById('geo');
+const logW = 540, logH = 480;
+canvas.width = logW * dpr;
+canvas.height = logH * dpr;
+canvas.style.width = logW + 'px';
+canvas.style.height = logH + 'px';
+const ctx = canvas.getContext('2d');
+ctx.scale(dpr, dpr);
+
+// Geometry: C at origin, y-up
+const a = 160; // side length in pixels
+const ox = 130, oy = 400; // canvas origin (C)
+function tx(x) { return ox + x; }
+function ty(y) { return oy - y; }
+
+const C = [0, 0];
+const B = [a, 0];
+const A = [0, a];
+const sq2 = Math.sqrt(2);
+const cd = a * (sq2 - 1);
+const D = [0, cd];
+// E: computed from the geometry
+const d = cd;
+const s_val = (a*a + a*d) / (a*a + d*d) * (a/4 + d/a); // let me recompute properly
+
+// Recompute with a as side length; using normalized coords where BC=AC=a=160
+// s = (a² + a·CD) / (a² + CD²) ... wait, let me redo from the coordinate derivation
+// With C=(0,0), A=(0,a), B=(a,0), D=(0,d) where d=CD=a(√2-1)
+// Line BD parameterized: P = B + t(D-B) = (a + t(-a), t·d) = (a(1-t), t·d)
+// E is at t = s where s = (a² + a·d)/(a² + d²)
+const s_e = (a*a + a*d) / (a*a + d*d);
+const E = [a*(1 - s_e), s_e * d];
+
+// midpoint of BD
+const M_BD = [(B[0]+D[0])/2, (B[1]+D[1])/2];
+
+const colors = {
+  base: '#475569',
+  triangle: '#38bdf8',
+  bd: '#fb923c',
+  ae: '#4ade80',
+  right: '#a78bfa',
+  sim1: '#f87171',
+  sim2: '#fbbf24',
+  bisector: '#38bdf8',
+  dim: 'rgba(71,85,105,0.5)',
+  highlight: '#fff',
+};
+
+function drawPoint(x, y, label, color, offX=8, offY=-8, size=4) {
+  ctx.beginPath();
+  ctx.arc(tx(x), ty(y), size, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.font = 'bold 15px -apple-system, sans-serif';
+  ctx.fillStyle = color;
+  ctx.fillText(label, tx(x)+offX, ty(y)+offY);
+}
+
+function drawSeg(x1,y1,x2,y2,color,w=2,dash=null) {
+  ctx.beginPath();
+  ctx.setLineDash(dash || []);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = w;
+  ctx.moveTo(tx(x1),ty(y1));
+  ctx.lineTo(tx(x2),ty(y2));
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawRightAngle(cx,cy, dx1,dy1, dx2,dy2, color, sz=12) {
+  // draw right angle mark at (cx,cy) in directions (dx1,dy1) and (dx2,dy2)
+  const len1 = Math.sqrt(dx1*dx1+dy1*dy1);
+  const len2 = Math.sqrt(dx2*dx2+dy2*dy2);
+  const ux1=dx1/len1*sz, uy1=dy1/len1*sz;
+  const ux2=dx2/len2*sz, uy2=dy2/len2*sz;
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.moveTo(tx(cx)+ux1, ty(cy)-uy1);
+  ctx.lineTo(tx(cx)+ux1+ux2, ty(cy)-uy1-uy2);
+  ctx.lineTo(tx(cx)+ux2, ty(cy)-uy2);
+  ctx.stroke();
+}
+
+function drawArc(cx,cy, r, a1,a2, color, lw=2) {
+  ctx.beginPath();
+  ctx.arc(tx(cx),ty(cy), r, -a2, -a1); // canvas y-flip
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.stroke();
+}
+
+function drawAngleLabel(cx,cy, a1,a2, r, text, color) {
+  const mid = (a1+a2)/2;
+  const lx = tx(cx) + r * Math.cos(mid);
+  const ly = ty(cy) - r * Math.sin(mid);
+  ctx.font = '13px -apple-system, sans-serif';
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, lx, ly);
+  ctx.textAlign = 'start';
+  ctx.textBaseline = 'alphabetic';
+}
+
+function fillTriangle(x1,y1,x2,y2,x3,y3,color) {
+  ctx.beginPath();
+  ctx.moveTo(tx(x1),ty(y1));
+  ctx.lineTo(tx(x2),ty(y2));
+  ctx.lineTo(tx(x3),ty(y3));
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+// Clear
+function clear() {
+  ctx.clearRect(0,0,logW,logH);
+}
+
+// Steps
+const steps = [
+  {
+    title: '题目条件',
+    nav: '① 题目',
+    content: `
+      <div class="proof-text">
+        <p>在 $\\triangle ABC$ 中：</p>
+        <p>• $AC = BC$（等腰直角三角形）</p>
+        <p>• $\\angle ACB = 90°$</p>
+        <p>• $D$ 是 $AC$ 上一点</p>
+        <p>• $AE \\perp BD$，交 $BD$ 的延长线于 $E$</p>
+        <p>• $AE = \\dfrac{1}{2}BD$</p>
+        <br>
+        <p><span class="highlight">求证：$BD$ 是 $\\angle ABC$ 的角平分线。</span></p>
+      </div>
+    `,
+    draw: function() {
+      // Base triangle
+      fillTriangle(...A,...B,...C, 'rgba(56,189,248,0.06)');
+      drawSeg(...C,...B, colors.triangle, 2.5);
+      drawSeg(...B,...A, colors.triangle, 2.5);
+      drawSeg(...A,...C, colors.triangle, 2.5);
+      // BD and extension to E
+      drawSeg(...B,...D, colors.bd, 2.5);
+      drawSeg(...D,...E, colors.bd, 2, [6,4]);
+      // AE
+      drawSeg(...A,...E, colors.ae, 2.5);
+      // Right angle at C
+      drawRightAngle(...C, 1,0, 0,1, colors.right);
+      // Right angle at E
+      const de = [E[0]-D[0], E[1]-D[1]];
+      const ae = [A[0]-E[0], A[1]-E[1]];
+      drawRightAngle(...E, de[0],de[1], ae[0],ae[1], colors.right);
+      // Points
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', -20, 0);
+      drawPoint(...E,'E','#4ade80', -6, -14);
+      // Labels
+      ctx.font = '13px sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('AC = BC', tx(-8), ty(a/2+20));
+    },
+    legend: '蓝色：△ABC | 橙色：BD | 绿色：AE'
+  },
+  {
+    title: '分析角度关系',
+    nav: '② 角度',
+    content: `
+      <div class="proof-text">
+        <p>设 $\\angle DBC = \\beta$。</p>
+        <br>
+        <p><b>在 Rt$\\triangle BCD$ 中</b>（$\\angle BCD = 90°$）：</p>
+        <span class="key-eq">$\\angle BDC = 90° - \\beta$</span>
+
+        <p><b>因为 $A$、$D$、$C$ 三点共线</b>（$D$ 在 $AC$ 上）：</p>
+        <span class="key-eq">$\\angle ADB + \\angle BDC = 180°$<br>$\\therefore\\ \\angle ADB = 90° + \\beta$</span>
+
+        <p><b>因为 $B$、$D$、$E$ 三点共线</b>（$E$ 在 $BD$ 延长线上）：</p>
+        <span class="key-eq">$\\angle ADB + \\angle ADE = 180°$<br>$\\therefore\\ \\angle ADE = 90° - \\beta$</span>
+
+        <p><b>在 Rt$\\triangle ADE$ 中</b>（$\\angle AED = 90°$）：</p>
+        <span class="key-eq">$\\angle DAE = 90° - \\angle ADE = \\beta$</span>
+
+        <p>💡 <span class="highlight">关键发现：$\\angle ADE = \\angle BDC = 90° - \\beta$</span></p>
+      </div>
+    `,
+    draw: function() {
+      fillTriangle(...A,...B,...C, 'rgba(56,189,248,0.03)');
+      drawSeg(...C,...B, colors.dim, 1.5);
+      drawSeg(...B,...A, colors.dim, 1.5);
+      drawSeg(...A,...C, colors.dim, 1.5);
+      drawSeg(...B,...D, colors.bd, 2);
+      drawSeg(...D,...E, colors.bd, 2, [6,4]);
+      drawSeg(...A,...E, colors.ae, 2);
+      drawRightAngle(...C, 1,0, 0,1, colors.right);
+      const de = [E[0]-D[0], E[1]-D[1]];
+      const ae = [A[0]-E[0], A[1]-E[1]];
+      drawRightAngle(...E, de[0],de[1], ae[0],ae[1], colors.right);
+
+      // Angle β at B
+      const angBC = Math.PI; // direction B→C
+      const angBD = Math.atan2(D[1]-B[1], D[0]-B[0]); // direction B→D
+      drawArc(...B, 30, angBD, angBC, colors.accent_yellow||'#fbbf24', 2);
+      drawAngleLabel(...B, angBD, angBC, 42, 'β', '#fbbf24');
+
+      // Angle at D: BDC
+      const angDB = Math.atan2(B[1]-D[1], B[0]-D[0]);
+      const angDC = Math.atan2(C[1]-D[1], C[0]-D[0]); // straight down
+      drawArc(...D, 25, angDC, angDB, '#f87171', 2);
+      drawAngleLabel(...D, angDC, angDB, 38, '90°-β', '#f87171');
+
+      // Angle at D: ADE
+      const angDA = Math.atan2(A[1]-D[1], A[0]-D[0]); // straight up
+      const angDE = Math.atan2(E[1]-D[1], E[0]-D[0]);
+      drawArc(...D, 25, angDE, angDA, '#f87171', 2);
+      drawAngleLabel(...D, angDE, angDA, 42, '90°-β', '#f87171');
+
+      // Angle DAE = β
+      const angAD_from_A = Math.atan2(D[1]-A[1], D[0]-A[0]);
+      const angAE_from_A = Math.atan2(E[1]-A[1], E[0]-A[0]);
+      drawArc(...A, 28, angAD_from_A, angAE_from_A, '#fbbf24', 2);
+      drawAngleLabel(...A, angAD_from_A, angAE_from_A, 42, 'β', '#fbbf24');
+
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', -20, 0);
+      drawPoint(...E,'E','#4ade80', -6, -14);
+    },
+    legend: '黄色角：β | 红色角：90°-β'
+  },
+  {
+    title: '证明 Rt△ADE ∼ Rt△BCD',
+    nav: '③ 相似',
+    content: `
+      <div class="proof-text">
+        <p><b>在 Rt$\\triangle ADE$ 与 Rt$\\triangle BCD$ 中：</b></p>
+        <br>
+        <p>① $\\angle AED = \\angle BCD = 90°$（已知）</p>
+        <p>② $\\angle ADE = \\angle BDC = 90° - \\beta$</p>
+        <p style="margin-left:24px;color:var(--text-secondary);">（由第②步角度分析得出）</p>
+        <br>
+        <span class="key-eq">$\\therefore\\ \\mathrm{Rt}\\triangle ADE \\sim \\mathrm{Rt}\\triangle BCD$（AA）</span>
+        <br>
+        <p>由相似得对应边成比例：</p>
+        <span class="key-eq">$\\dfrac{AE}{BC} = \\dfrac{AD}{BD} = \\dfrac{DE}{CD}$</span>
+      </div>
+    `,
+    draw: function() {
+      drawSeg(...C,...B, colors.dim, 1);
+      drawSeg(...B,...A, colors.dim, 1);
+      drawSeg(...A,...C, colors.dim, 1);
+      drawSeg(...B,...D, colors.dim, 1.5);
+      drawSeg(...D,...E, colors.dim, 1.5, [6,4]);
+      drawSeg(...A,...E, colors.dim, 1.5);
+
+      // Highlight △ADE
+      fillTriangle(...A,...D,...E, 'rgba(248,113,113,0.15)');
+      drawSeg(...A,...D, '#f87171', 2.5);
+      drawSeg(...D,...E, '#f87171', 2.5);
+      drawSeg(...A,...E, '#f87171', 2.5);
+
+      // Highlight △BCD
+      fillTriangle(...B,...C,...D, 'rgba(251,191,36,0.15)');
+      drawSeg(...B,...C, '#fbbf24', 2.5);
+      drawSeg(...C,...D, '#fbbf24', 2.5);
+      drawSeg(...B,...D, '#fbbf24', 2.5);
+
+      drawRightAngle(...C, 1,0, 0,1, '#fbbf24');
+      const de_dir = [E[0]-D[0], E[1]-D[1]];
+      const ae_dir = [A[0]-E[0], A[1]-E[1]];
+      drawRightAngle(...E, de_dir[0],de_dir[1], ae_dir[0],ae_dir[1], '#f87171');
+
+      // "~" symbol between triangles
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillStyle = '#a78bfa';
+      ctx.textAlign = 'center';
+      ctx.fillText('∼', tx(40), ty(45));
+      ctx.textAlign = 'start';
+
+      // Labels
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#f87171';
+      ctx.fillText('△ADE', tx(E[0]-60), ty(E[1]+30));
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText('△BCD', tx(B[0]/2+10), ty(-25));
+
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', -20, 0);
+      drawPoint(...E,'E','#4ade80', -6, -14);
+    },
+    legend: '红色：△ADE | 黄色：△BCD | ∼ 表示相似'
+  },
+  {
+    title: '代入 AE = ½BD，建立方程',
+    nav: '④ 方程',
+    content: `
+      <div class="proof-text">
+        <p>设 $BC = AC = a$。</p>
+        <br>
+        <p>由 $\\triangle ADE \\sim \\triangle BCD$：</p>
+        <span class="key-eq">$\\dfrac{AE}{BC} = \\dfrac{AD}{BD}$，即 $\\dfrac{AE}{a} = \\dfrac{AD}{BD}$</span>
+
+        <p>代入条件 $AE = \\dfrac{1}{2}BD$：</p>
+        <span class="key-eq">$\\dfrac{BD}{2a} = \\dfrac{AD}{BD}$</span>
+        <span class="key-eq">$BD^2 = 2a \\cdot AD \\quad\\cdots\\cdots$ ①</span>
+
+        <p>在 Rt$\\triangle BCD$ 中（勾股定理）：</p>
+        <span class="key-eq">$BD^2 = BC^2 + CD^2 = a^2 + CD^2 \\quad\\cdots\\cdots$ ②</span>
+
+        <p>又因为 $D$ 在 $AC$ 上：</p>
+        <span class="key-eq">$AD = AC - CD = a - CD \\quad\\cdots\\cdots$ ③</span>
+      </div>
+    `,
+    draw: function() {
+      fillTriangle(...A,...B,...C, 'rgba(56,189,248,0.04)');
+      drawSeg(...C,...B, colors.triangle, 2);
+      drawSeg(...B,...A, colors.dim, 1.5);
+      drawSeg(...A,...C, colors.triangle, 2);
+      drawSeg(...B,...D, colors.bd, 2.5);
+      drawSeg(...D,...E, colors.bd, 1.5, [6,4]);
+      drawSeg(...A,...E, colors.ae, 2.5);
+      drawRightAngle(...C, 1,0, 0,1, colors.right);
+
+      // Label lengths
+      ctx.font = 'bold 14px sans-serif';
+      // BC = a
+      ctx.fillStyle = colors.triangle;
+      ctx.fillText('a', tx(a/2), ty(-18));
+      // AC = a
+      ctx.fillText('a', tx(-18), ty(a/2));
+      // AD
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText('AD', tx(-32), ty((a+cd)/2));
+      // CD
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText('CD', tx(-28), ty(cd/2));
+      // BD
+      ctx.fillStyle = colors.bd;
+      const mx = (B[0]+D[0])/2, my = (B[1]+D[1])/2;
+      ctx.fillText('BD', tx(mx)+8, ty(my)-8);
+      // AE = ½BD
+      ctx.fillStyle = colors.ae;
+      const mx2 = (A[0]+E[0])/2, my2 = (A[1]+E[1])/2;
+      ctx.fillText('½BD', tx(mx2)-30, ty(my2)-4);
+
+      // D divides AC
+      ctx.setLineDash([]);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(tx(D[0])-4, ty(D[1]));
+      ctx.lineTo(tx(D[0])+4, ty(D[1]));
+      ctx.stroke();
+
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', 6, 0);
+      drawPoint(...E,'E','#4ade80', -6, -14);
+    },
+    legend: 'BD² = 2a·AD ... ①'
+  },
+  {
+    title: '解方程求 CD',
+    nav: '⑤ 求解',
+    content: `
+      <div class="proof-text">
+        <p>将 ②③ 代入 ①：</p>
+        <span class="key-eq">$a^2 + CD^2 = 2a(a - CD)$</span>
+
+        <p>展开整理：</p>
+        <span class="key-eq">$a^2 + CD^2 = 2a^2 - 2a \\cdot CD$</span>
+        <span class="key-eq">$CD^2 + 2a \\cdot CD - a^2 = 0$</span>
+
+        <p>由求根公式（取正根）：</p>
+        <span class="key-eq">
+          $CD = \\dfrac{-2a + \\sqrt{4a^2 + 4a^2}}{2} = \\dfrac{-2a + 2\\sqrt{2}\\,a}{2}$
+        </span>
+        <span class="key-eq" style="border-color: var(--accent-orange);">
+          $\\boxed{CD = a(\\sqrt{2} - 1)}$
+        </span>
+
+        <p>从而：</p>
+        <span class="key-eq" style="border-color: var(--accent-green);">
+          $AD = a - CD = a(2 - \\sqrt{2})$
+        </span>
+      </div>
+    `,
+    draw: function() {
+      fillTriangle(...A,...B,...C, 'rgba(56,189,248,0.04)');
+      drawSeg(...C,...B, colors.triangle, 2);
+      drawSeg(...B,...A, colors.dim, 1.5);
+      drawSeg(...A,...C, colors.triangle, 2);
+      drawSeg(...B,...D, colors.bd, 2);
+      drawRightAngle(...C, 1,0, 0,1, colors.right);
+
+      // Highlight CD and AD with different colors
+      drawSeg(...C,...D, '#fbbf24', 3);
+      drawSeg(...D,...A, '#4ade80', 3);
+
+      // BC = a
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = colors.triangle;
+      ctx.fillText('a', tx(a/2), ty(-18));
+
+      // CD = a(√2-1)
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('a(√2−1)', tx(-70), ty(cd/2));
+
+      // AD = a(2-√2)
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText('a(2−√2)', tx(-64), ty((a+cd)/2));
+
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', 6, 0);
+    },
+    legend: 'CD = a(√2−1) | AD = a(2−√2)'
+  },
+  {
+    title: '验证角平分线条件',
+    nav: '⑥ 判定',
+    content: `
+      <div class="proof-text">
+        <p>计算 $\\dfrac{AD}{DC}$：</p>
+        <span class="key-eq">
+          $\\dfrac{AD}{DC} = \\dfrac{a(2-\\sqrt{2})}{a(\\sqrt{2}-1)} = \\dfrac{2-\\sqrt{2}}{\\sqrt{2}-1}$
+        </span>
+
+        <p>分母有理化：</p>
+        <span class="key-eq">
+          $= \\dfrac{(2-\\sqrt{2})(\\sqrt{2}+1)}{(\\sqrt{2}-1)(\\sqrt{2}+1)} = \\dfrac{2\\sqrt{2}+2-2-\\sqrt{2}}{2-1} = \\sqrt{2}$
+        </span>
+
+        <p>计算 $\\dfrac{AB}{BC}$：</p>
+        <span class="key-eq">
+          $AB = \\sqrt{AC^2 + BC^2} = \\sqrt{a^2 + a^2} = a\\sqrt{2}$
+        </span>
+        <span class="key-eq">
+          $\\dfrac{AB}{BC} = \\dfrac{a\\sqrt{2}}{a} = \\sqrt{2}$
+        </span>
+
+        <p>因此：</p>
+        <span class="key-eq" style="border-color: var(--accent-purple); background: rgba(167,139,250,0.1);">
+          $\\dfrac{AD}{DC} = \\dfrac{AB}{BC} = \\sqrt{2}$
+        </span>
+      </div>
+    `,
+    draw: function() {
+      fillTriangle(...A,...B,...C, 'rgba(56,189,248,0.04)');
+      drawSeg(...C,...B, colors.triangle, 2);
+      drawSeg(...B,...A, '#a78bfa', 2.5);
+      drawSeg(...A,...C, colors.triangle, 2);
+      drawSeg(...B,...D, colors.bd, 2);
+      drawRightAngle(...C, 1,0, 0,1, colors.right);
+
+      // CD and AD
+      drawSeg(...C,...D, '#fbbf24', 3);
+      drawSeg(...D,...A, '#4ade80', 3);
+
+      // Labels
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText('1', tx(-14), ty(cd/2));
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText('√2', tx(-26), ty((a+cd)/2));
+
+      // AB = a√2
+      ctx.fillStyle = '#a78bfa';
+      ctx.save();
+      ctx.translate(tx(a/2)+10, ty(a/2)-10);
+      ctx.rotate(-Math.PI/4);
+      ctx.fillText('a√2', 0, 0);
+      ctx.restore();
+
+      // BC = a
+      ctx.fillStyle = colors.triangle;
+      ctx.fillText('a', tx(a/2), ty(-18));
+
+      // Ratio equation
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillStyle = '#a78bfa';
+      ctx.textAlign = 'center';
+      ctx.fillText('AD/DC = AB/BC = √2', tx(a/2), ty(a+30));
+      ctx.textAlign = 'start';
+
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', 6, 0);
+    },
+    legend: 'AD/DC = AB/BC = √2'
+  },
+  {
+    title: '结论：BD 平分 ∠ABC',
+    nav: '⑦ 结论',
+    content: `
+      <div class="proof-text">
+        <p><b>角平分线判定定理（逆定理）：</b></p>
+        <p style="color:var(--text-secondary);margin:8px 0 16px 0;">
+          在 $\\triangle ABC$ 中，$D$ 在边 $AC$ 上，若 $\\dfrac{AD}{DC} = \\dfrac{AB}{BC}$，则 $BD$ 平分 $\\angle ABC$。
+        </p>
+
+        <p>由第⑥步已证：</p>
+        <span class="key-eq" style="border-color: var(--accent-purple);">
+          $\\dfrac{AD}{DC} = \\dfrac{AB}{BC} = \\sqrt{2}$
+        </span>
+
+        <span class="conclusion">
+          $\\therefore\\ BD$ 是 $\\angle ABC$ 的角平分线。$\\quad\\blacksquare$
+        </span>
+
+        <br>
+        <p style="color:var(--text-secondary);font-size:13px;">
+          <b>证明方法回顾：</b><br>
+          ① 分析角度关系 → ② 证相似三角形(AA) → ③ 由相似比 + 已知条件列方程 → ④ 解方程求出CD → ⑤ 验证角平分线判定条件
+        </p>
+      </div>
+    `,
+    draw: function() {
+      fillTriangle(...A,...B,...C, 'rgba(56,189,248,0.08)');
+      drawSeg(...C,...B, colors.triangle, 2.5);
+      drawSeg(...B,...A, colors.triangle, 2.5);
+      drawSeg(...A,...C, colors.triangle, 2.5);
+      drawRightAngle(...C, 1,0, 0,1, colors.right);
+
+      // BD as bisector — highlighted
+      drawSeg(...B,...D, '#4ade80', 3);
+      // Extension
+      drawSeg(...D,...E, '#4ade80', 2, [6,4]);
+      drawSeg(...A,...E, colors.ae, 2);
+
+      const de_dir = [E[0]-D[0], E[1]-D[1]];
+      const ae_dir = [A[0]-E[0], A[1]-E[1]];
+      drawRightAngle(...E, de_dir[0],de_dir[1], ae_dir[0],ae_dir[1], colors.right);
+
+      // Equal angle arcs
+      const angBC_from_B = Math.atan2(C[1]-B[1], C[0]-B[0]);
+      const angBD_from_B = Math.atan2(D[1]-B[1], D[0]-B[0]);
+      const angBA_from_B = Math.atan2(A[1]-B[1], A[0]-B[0]);
+
+      drawArc(...B, 35, angBC_from_B, angBD_from_B, '#4ade80', 2.5);
+      drawArc(...B, 30, angBC_from_B, angBD_from_B, '#4ade80', 2.5);
+      drawArc(...B, 35, angBD_from_B, angBA_from_B, '#4ade80', 2.5);
+      drawArc(...B, 30, angBD_from_B, angBA_from_B, '#4ade80', 2.5);
+
+      // Tick marks on arcs to show equal
+      function tickOnArc(cx,cy,r,angle,len) {
+        const mx = tx(cx) + r*Math.cos(-angle);
+        const my = ty(cy) + r*Math.sin(-angle);
+        const nx = Math.cos(-angle+Math.PI/2)*len;
+        const ny = Math.sin(-angle+Math.PI/2)*len;
+        ctx.beginPath();
+        ctx.moveTo(mx-nx, my-ny);
+        ctx.lineTo(mx+nx, my+ny);
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      const mid1 = (angBC_from_B + angBD_from_B)/2;
+      const mid2 = (angBD_from_B + angBA_from_B)/2;
+      tickOnArc(...B, 32.5, mid1, 5);
+      tickOnArc(...B, 32.5, mid2, 5);
+
+      drawAngleLabel(...B, angBC_from_B, angBD_from_B, 50, '22.5°', '#4ade80');
+      drawAngleLabel(...B, angBD_from_B, angBA_from_B, 50, '22.5°', '#4ade80');
+
+      // QED
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillStyle = '#4ade80';
+      ctx.textAlign = 'center';
+      ctx.fillText('∠ABD = ∠DBC ✓', tx(a/2), ty(a+30));
+      ctx.textAlign = 'start';
+
+      drawPoint(...A,'A',colors.highlight, -20, -8);
+      drawPoint(...B,'B',colors.highlight, 8, 12);
+      drawPoint(...C,'C',colors.highlight, -20, 12);
+      drawPoint(...D,'D','#fb923c', -20, 0);
+      drawPoint(...E,'E','#4ade80', -6, -14);
+    },
+    legend: '✓ BD 平分 ∠ABC，∠ABD = ∠DBC = 22.5°'
+  }
+];
+
+let currentStep = 0;
+
+function buildNav() {
+  const nav = document.getElementById('stepNav');
+  nav.innerHTML = '';
+  steps.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'step-btn' + (i === currentStep ? ' active' : (i < currentStep ? ' completed' : ''));
+    btn.textContent = s.nav;
+    btn.onclick = () => goStep(i);
+    nav.appendChild(btn);
+  });
+}
+
+function goStep(i) {
+  if (i < 0 || i >= steps.length) return;
+  currentStep = i;
+  buildNav();
+  clear();
+  steps[i].draw();
+  document.getElementById('proofPanel').innerHTML =
+    '<div class="step-title"><span class="num">'+(i+1)+'</span>'+steps[i].title+'</div>' +
+    steps[i].content;
+  renderMathInElement(document.getElementById('proofPanel'), {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ]
+  });
+  document.getElementById('prevBtn').disabled = (i === 0);
+  document.getElementById('nextBtn').disabled = (i === steps.length - 1);
+  document.getElementById('stepInd').textContent = '步骤 '+(i+1)+'/'+steps.length;
+  document.getElementById('legend').textContent = steps[i].legend || '';
+  document.getElementById('proofPanel').scrollTop = 0;
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { goStep(currentStep+1); e.preventDefault(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { goStep(currentStep-1); e.preventDefault(); }
+});
+
+// Init
+goStep(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>练7 · Rt△ABC综合题</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-purple: #a78bfa;
+      --accent-red: #f87171;
+      --accent-yellow: #fbbf24;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .header {
+      background: var(--bg-secondary);
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    .header h1 { font-size: 15px; color: var(--accent-blue); margin-bottom: 3px; }
+    .header .problem-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+    .step-nav {
+      display: flex; gap: 4px; padding: 8px 20px;
+      background: var(--bg-secondary); border-bottom: 1px solid var(--bg-tertiary);
+      flex-wrap: wrap;
+    }
+    .step-btn {
+      padding: 5px 10px; border: 1px solid var(--bg-tertiary);
+      background: transparent; color: var(--text-secondary);
+      border-radius: 5px; cursor: pointer; font-size: 11px;
+      transition: all 0.3s; white-space: nowrap;
+    }
+    .step-btn:hover { border-color: var(--accent-blue); color: var(--text-primary); }
+    .step-btn.active { background: var(--accent-blue); color: var(--bg-primary); border-color: var(--accent-blue); font-weight: 600; }
+    .step-btn.completed { border-color: var(--accent-green); color: var(--accent-green); }
+    .main-area { display: flex; flex-direction: row; height: calc(100vh - 130px); }
+    .canvas-panel {
+      flex: 0 0 45%; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-primary); border-right: 1px solid var(--bg-tertiary); padding: 8px;
+    }
+    .proof-panel { flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--bg-secondary); }
+    .proof-panel h3 { color: var(--accent-blue); font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .proof-panel h3 .step-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; background: var(--accent-blue);
+      color: var(--bg-primary); border-radius: 50%; font-size: 11px; font-weight: 700;
+    }
+    .proof-content { font-size: 13px; line-height: 1.9; color: var(--text-primary); }
+    .proof-content .reason { color: var(--accent-purple); font-size: 12px; }
+    .proof-content .conclusion {
+      background: rgba(74, 222, 128, 0.1); border-left: 3px solid var(--accent-green);
+      padding: 8px 14px; margin: 10px 0; border-radius: 0 6px 6px 0;
+    }
+    .proof-content .conclusion strong { color: var(--accent-green); }
+    .proof-content .key-eq {
+      background: rgba(56, 189, 248, 0.1); border-left: 3px solid var(--accent-blue);
+      padding: 8px 14px; margin: 10px 0; border-radius: 0 6px 6px 0;
+    }
+    .proof-content .warning {
+      background: rgba(251, 191, 36, 0.1); border-left: 3px solid var(--accent-yellow);
+      padding: 8px 14px; margin: 10px 0; border-radius: 0 6px 6px 0;
+      font-size: 12px; color: var(--accent-yellow);
+    }
+    .proof-content p { margin-bottom: 4px; }
+    .nav-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 20px; background: var(--bg-secondary);
+      border-top: 1px solid var(--bg-tertiary); position: fixed; bottom: 0; left: 0; right: 0;
+    }
+    .nav-btn {
+      padding: 6px 16px; border: 1px solid var(--accent-blue); background: transparent;
+      color: var(--accent-blue); border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s;
+    }
+    .nav-btn:hover { background: var(--accent-blue); color: var(--bg-primary); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-info { color: var(--text-secondary); font-size: 12px; }
+    .katex { font-size: 1.05em; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📐 练7 · Rt△ABC 综合题 (三问)</h1>
+    <div class="problem-text">
+      Rt△ABC中，∠ABC=90°，AB=BC，过点A作AE⊥AB，连接BE、CE，M为平面内一动点。
+    </div>
+  </div>
+  <div class="step-nav" id="stepNav"></div>
+  <div class="main-area">
+    <div class="canvas-panel"><canvas id="geo" width="480" height="440"></canvas></div>
+    <div class="proof-panel" id="proofPanel"></div>
+  </div>
+  <div class="nav-footer">
+    <button class="nav-btn" id="prevBtn" onclick="goToStep(currentStep-1)">◀ 上一步</button>
+    <span class="nav-info" id="navInfo"></span>
+    <button class="nav-btn" id="nextBtn" onclick="goToStep(currentStep+1)">下一步 ▶</button>
+  </div>
+
+  <script>
+    const W = 480, H = 440;
+    const dpr = window.devicePixelRatio || 1;
+    const canvas = document.getElementById('geo');
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // 坐标系: B在中偏左下
+    const scale = 30;
+    const ox = 150, oy = H - 80;
+    function toC(gx, gy) { return [ox + gx * scale, oy - gy * scale]; }
+
+    // 几何点 (a=6)
+    const a = 6;
+    const gB = [0, 0], gA = [0, a], gC = [a, 0];
+    // E: AE⊥AB, t=6+3√5 ≈ 12.71
+    const t_E = 6 + 3 * Math.sqrt(5);
+    const gE = [t_E, a];
+    const gD_ac = [a / 2, a / 2]; // AC midpoint
+
+    // F, M on BE (for part 2, using a specific AE length)
+    function projOnBE(P) {
+      const bx = gE[0], by = gE[1];
+      const len2 = bx * bx + by * by;
+      const dot = P[0] * bx + P[1] * by;
+      const t = dot / len2;
+      return [t * bx, t * by];
+    }
+    const gF = projOnBE(gA);
+    const gM_be = projOnBE(gC);
+    // H: FD延长交CM
+    const gH = [2 * gD_ac[0] - gF[0], 2 * gD_ac[1] - gF[1]];
+
+    // 绘图工具
+    function drawLine(p1, p2, color, w = 2, dash = []) {
+      const [x1, y1] = toC(...p1), [x2, y2] = toC(...p2);
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+    }
+    function drawPt(p, label, color = '#f1f5f9', off = [8, -10], sz = 3.5) {
+      const [x, y] = toC(...p);
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, sz, 0, Math.PI * 2); ctx.fill();
+      ctx.font = 'bold 13px sans-serif'; ctx.fillText(label, x + off[0], y + off[1]);
+    }
+    function drawRA(v, p1, p2, sz = 10, color = '#94a3b8') {
+      const [vx, vy] = toC(...v), [x1, y1] = toC(...p1), [x2, y2] = toC(...p2);
+      let d1x = x1 - vx, d1y = y1 - vy, l1 = Math.sqrt(d1x * d1x + d1y * d1y);
+      let d2x = x2 - vx, d2y = y2 - vy, l2 = Math.sqrt(d2x * d2x + d2y * d2y);
+      let u1x = d1x / l1 * sz, u1y = d1y / l1 * sz, u2x = d2x / l2 * sz, u2y = d2y / l2 * sz;
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(vx + u1x, vy + u1y); ctx.lineTo(vx + u1x + u2x, vy + u1y + u2y);
+      ctx.lineTo(vx + u2x, vy + u2y); ctx.stroke(); ctx.restore();
+    }
+    function drawAngle(v, p1, p2, r, label, color = '#fbbf24') {
+      const [vx, vy] = toC(...v), [x1, y1] = toC(...p1), [x2, y2] = toC(...p2);
+      let a1 = Math.atan2(y1 - vy, x1 - vx), a2 = Math.atan2(y2 - vy, x2 - vx);
+      let d = a2 - a1;
+      if (d > Math.PI) a2 -= 2 * Math.PI; if (d < -Math.PI) a2 += 2 * Math.PI;
+      if (a1 > a2) { let t = a1; a1 = a2; a2 = t; }
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(vx, vy, r, a1, a2); ctx.stroke();
+      if (label) {
+        const m = (a1 + a2) / 2;
+        ctx.fillStyle = color; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(label, vx + (r + 12) * Math.cos(m), vy + (r + 12) * Math.sin(m));
+      }
+      ctx.restore();
+    }
+    function fillTri(p1, p2, p3, color) {
+      const [x1, y1] = toC(...p1), [x2, y2] = toC(...p2), [x3, y3] = toC(...p3);
+      ctx.save(); ctx.fillStyle = color;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineTo(x3, y3); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    function hlLine(p1, p2, color, w = 4) {
+      const [x1, y1] = toC(...p1), [x2, y2] = toC(...p2);
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w;
+      ctx.shadowColor = color; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+    }
+    function drawMark(p1, p2, color = '#94a3b8', n = 1) {
+      const [x1, y1] = toC(...p1), [x2, y2] = toC(...p2);
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy);
+      const nx = -dy / len * 5, ny = dx / len * 5;
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2;
+      for (let i = 0; i < n; i++) {
+        const off = (i - (n - 1) / 2) * 4;
+        const ox2 = dx / len * off, oy2 = dy / len * off;
+        ctx.beginPath(); ctx.moveTo(mx + ox2 - nx, my + oy2 - ny);
+        ctx.lineTo(mx + ox2 + nx, my + oy2 + ny); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    function drawCircle(center, radius, color, w = 1.5, dash = [4, 4]) {
+      const [cx, cy] = toC(...center);
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash);
+      ctx.beginPath(); ctx.arc(cx, cy, radius * scale, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+    function drawText(gx, gy, text, color = '#fbbf24', size = '14px') {
+      const [x, y] = toC(gx, gy);
+      ctx.save(); ctx.fillStyle = color; ctx.font = `bold ${size} sans-serif`;
+      ctx.fillText(text, x, y); ctx.restore();
+    }
+
+    // 基础三角形
+    function drawBase(showE = true) {
+      drawLine(gB, gA, '#64748b'); drawLine(gA, gC, '#64748b'); drawLine(gB, gC, '#64748b');
+      drawRA(gB, gA, gC, 10);
+      drawPt(gB, 'B', '#f1f5f9', [-18, 10]);
+      drawPt(gA, 'A', '#f1f5f9', [-18, -6]);
+      drawPt(gC, 'C', '#f1f5f9', [8, 14]);
+      if (showE) {
+        drawLine(gA, gE, '#64748b', 1.5, [4, 4]);
+        drawLine(gB, gE, '#64748b', 1.5, [4, 4]);
+        drawLine(gC, gE, '#64748b', 1.5, [4, 4]);
+        drawRA(gA, gB, gE, 10);
+        drawPt(gE, 'E', '#f1f5f9', [4, -12]);
+      }
+    }
+
+    // ========== 步骤定义 ==========
+    const steps = [
+      {
+        title: '(1) 求面积',
+        draw() {
+          // 图1: 基本三角形 + E + 高亮△EBC
+          drawBase();
+          fillTri(gE, gB, gC, 'rgba(56,189,248,0.1)');
+          drawLine(gE, gB, '#38bdf8', 2); drawLine(gE, gC, '#38bdf8', 2); drawLine(gB, gC, '#38bdf8', 2);
+          drawAngle(gB, gA, gC, 24, '90°');
+          drawMark(gB, gA, '#fb923c'); drawMark(gB, gC, '#fb923c');
+          // height from E to BC
+          drawLine(gE, [gE[0], 0], '#fbbf24', 1.5, [3, 3]);
+          drawLine([0, a], [gE[0], a], '#fbbf24', 1, [3, 3]);
+          drawText(gE[0] / 2, a + 0.8, 'AE⊥AB → E在y=AB的水平线上', '#94a3b8', '11px');
+          drawText(gE[0] + 0.3, a / 2, 'h=AB=4', '#fbbf24', '12px');
+        },
+        html: `
+          <h3><span class="step-icon">1</span> 第(1)题：求 $S_{\\triangle EBC}$</h3>
+          <div class="proof-content">
+            <p><strong>已知:</strong> $BC = 4$, $AB = BC = 4$, $\\angle ABC = 90°$</p>
+            <p>$AE \\perp AB$，即 $AE$ 水平（与 $AB$ 垂直）</p>
+            <br>
+            <p><strong>关键观察：</strong></p>
+            <p>∵ $AE \\perp AB$，$A$ 在 $B$ 正上方</p>
+            <p>∴ $E$ 在过 $A$ 的水平线上（与 $AB$ 垂直的方向）</p>
+            <p>∴ $E$ 的高度 = $A$ 的高度 = $AB = 4$</p>
+            <br>
+            <p>而 $BC$ 在水平方向上（$\\angle ABC=90°$，$B$ 在左下）</p>
+            <p>∴ $E$ 到 $BC$ 所在直线的距离 $h = AB = 4$</p>
+            <br>
+            <div class="warning">
+              💡 无论 $AE$ 的长度是多少，$E$ 到 $BC$ 的距离都等于 $AB$！
+            </div>
+            <br>
+            <div class="conclusion">
+              $S_{\\triangle EBC} = \\dfrac{1}{2} \\times BC \\times h = \\dfrac{1}{2} \\times 4 \\times 4 = \\boxed{8}$
+            </div>
+          </div>
+        `
+      },
+      {
+        title: '(2)① 全等',
+        draw() {
+          drawLine(gB, gA, '#475569'); drawLine(gA, gC, '#475569'); drawLine(gB, gC, '#475569');
+          drawLine(gA, gE, '#475569', 1.5, [4, 4]);
+          drawLine(gB, gE, '#475569', 1.5);
+          drawLine(gC, gE, '#475569', 1, [4, 4]);
+          // △ABF (orange)
+          fillTri(gA, gB, gF, 'rgba(251,146,60,0.12)');
+          drawLine(gA, gB, '#fb923c', 2.5); drawLine(gB, gF, '#fb923c', 2.5); drawLine(gA, gF, '#fb923c', 2.5);
+          // △BCM (blue)
+          fillTri(gB, gC, gM_be, 'rgba(56,189,248,0.12)');
+          drawLine(gB, gC, '#38bdf8', 2.5); drawLine(gC, gM_be, '#38bdf8', 2.5); drawLine(gB, gM_be, '#38bdf8', 2.5);
+          drawRA(gF, gA, gB, 10, '#4ade80'); drawRA(gM_be, gC, gB, 10, '#4ade80');
+          drawRA(gB, gA, gC, 10); drawRA(gA, gB, gE, 10);
+          drawAngle(gB, gA, gF, 22, '∠1', '#fb923c');
+          drawAngle(gB, gC, gM_be, 22, '∠2', '#38bdf8');
+          drawMark(gA, gB, '#a78bfa'); drawMark(gB, gC, '#a78bfa');
+          drawPt(gB, 'B', '#f1f5f9', [-18, 10]); drawPt(gA, 'A', '#f1f5f9', [-18, -6]);
+          drawPt(gC, 'C', '#f1f5f9', [8, 14]); drawPt(gE, 'E', '#f1f5f9', [4, -12]);
+          drawPt(gF, 'F', '#fb923c', [-18, -8]); drawPt(gM_be, 'M', '#38bdf8', [8, 8]);
+        },
+        html: `
+          <h3><span class="step-icon">2</span> 第(2)①：证明 $\\triangle ABF \\cong \\triangle BCM$</h3>
+          <div class="proof-content">
+            <p><strong>已知:</strong> $M$ 在 $BE$ 上，$CM \\perp BE$，$AF \\perp BE$</p>
+            <br>
+            <p>∵ $AF \\perp BE$ &nbsp;∴ $\\angle AFB = 90°$</p>
+            <p>∵ $CM \\perp BE$ &nbsp;∴ $\\angle CMB = 90°$</p>
+            <br>
+            <p>在 $\\text{Rt}\\triangle ABF$ 中：</p>
+            <p>$\\angle ABF + \\angle BAF = 90°$ &nbsp;…①</p>
+            <br>
+            <p>又 $\\angle ABC = 90°$：</p>
+            <p>$\\angle ABF + \\angle CBM = 90°$ &nbsp;…②</p>
+            <br>
+            <p>由①② 得：$\\angle BAF = \\angle CBM$</p>
+            <br>
+            <p>在 $\\text{Rt}\\triangle ABF$ 和 $\\text{Rt}\\triangle BCM$ 中：</p>
+            <div class="key-eq">
+              $\\angle AFB = \\angle CMB = 90°$<br>
+              $\\angle BAF = \\angle CBM$<br>
+              $AB = BC$
+            </div>
+            <div class="conclusion">
+              <strong>∴ $\\triangle ABF \\cong \\triangle BCM$ (AAS) $\\blacksquare$</strong>
+            </div>
+            <p>由全等得：$AF = BM$，$BF = CM$</p>
+          </div>
+        `
+      },
+      {
+        title: '(2)② MF=MH 分析',
+        draw() {
+          drawLine(gB, gA, '#475569'); drawLine(gA, gC, '#475569'); drawLine(gB, gC, '#475569');
+          drawLine(gA, gE, '#475569', 1, [4, 4]); drawLine(gB, gE, '#475569', 1.5);
+          // AF, CM ⊥ BE → parallel
+          drawLine(gA, gF, '#fb923c', 2, [4, 4]); drawLine(gC, gM_be, '#38bdf8', 2, [4, 4]);
+          // 三条平行线标记
+          drawText(-1.5, a / 2 + 1.5, 'AF', '#fb923c', '12px');
+          drawText(a + 0.5, -1, 'CM', '#38bdf8', '12px');
+          // FDH line
+          drawLine(gF, gH, '#4ade80', 2);
+          drawPt(gD_ac, 'D', '#fbbf24', [-4, -14], 4);
+          // parallel arrows
+          drawText(-2.5, 3, '⫽', '#a78bfa', '16px');
+          drawText(a + 0.5, 1.5, '⫽', '#a78bfa', '16px');
+          // highlight MF and MH
+          hlLine(gM_be, gF, 'rgba(251,146,60,0.5)', 5);
+          hlLine(gM_be, gH, 'rgba(74,222,128,0.5)', 5);
+          drawRA(gB, gA, gC, 10); drawRA(gA, gB, gE, 10);
+          drawRA(gF, gA, gB, 10, '#fb923c'); drawRA(gM_be, gC, gB, 10, '#38bdf8');
+          drawPt(gB, 'B', '#f1f5f9', [-18, 10]); drawPt(gA, 'A', '#f1f5f9', [-18, -6]);
+          drawPt(gC, 'C', '#f1f5f9', [8, 14]); drawPt(gE, 'E', '#f1f5f9', [4, -12]);
+          drawPt(gF, 'F', '#fb923c', [-18, -8]); drawPt(gM_be, 'M', '#38bdf8', [8, 8]);
+          drawPt(gH, 'H', '#4ade80', [8, 8]);
+        },
+        html: `
+          <h3><span class="step-icon">3</span> 第(2)②：证明 $MF = MH$（分析）</h3>
+          <div class="proof-content">
+            <p><strong>已知:</strong> $D$ 是 $AC$ 中点，$FD$ 延长交 $CM$ 于 $H$</p>
+            <br>
+            <p><strong>关键观察①：</strong></p>
+            <p>∵ $AF \\perp BE$，$CM \\perp BE$</p>
+            <p>∴ $AF \\mathbin{/\\!/} CM$（同垂直于 $BE$）</p>
+            <p>又 $H$ 在直线 $CM$ 上</p>
+            <p>∴ $AF \\mathbin{/\\!/} CH$</p>
+            <br>
+            <p><strong>关键观察②：</strong></p>
+            <p>$F$ 在 $BE$ 上，$M$ 在 $BE$ 上，$H$ 在 $CM$ 上（$CM \\perp BE$）</p>
+            <p>∴ $\\angle FMH = 90°$</p>
+            <br>
+            <p><strong>证明策略：</strong></p>
+            <p>① 用平行线等分定理证 $FD = DH$</p>
+            <p>② 在 $\\text{Rt}\\triangle FMH$ 中利用 HL 全等</p>
+          </div>
+        `
+      },
+      {
+        title: '(2)② 证明',
+        draw() {
+          drawLine(gB, gA, '#475569'); drawLine(gA, gC, '#475569'); drawLine(gB, gC, '#475569');
+          drawLine(gB, gE, '#475569', 1.5);
+          // 三条平行线
+          drawLine(gA, gF, '#fb923c', 2); // AF
+          // 过D作⊥BE
+          const BE = [gE[0], gE[1]];
+          const BElen = Math.sqrt(BE[0] * BE[0] + BE[1] * BE[1]);
+          const n = [-BE[1] / BElen, BE[0] / BElen];
+          const dl = 2.5;
+          drawLine([gD_ac[0] - n[0] * dl, gD_ac[1] - n[1] * dl], [gD_ac[0] + n[0] * dl, gD_ac[1] + n[1] * dl], '#a78bfa', 1.5, [3, 3]);
+          drawLine(gC, gH, '#38bdf8', 2); // CH
+          // FDH
+          drawLine(gF, gH, '#4ade80', 2.5);
+          // marks FD=DH
+          drawMark(gF, gD_ac, '#4ade80'); drawMark(gD_ac, gH, '#4ade80');
+          // ∠FMH = 90°
+          drawRA(gM_be, gF, gH, 12, '#fbbf24');
+          // marks FD=DH on triangle
+          drawMark(gF, gD_ac, '#fbbf24', 2); drawMark(gD_ac, gH, '#fbbf24', 2);
+          drawRA(gB, gA, gC, 10); drawRA(gA, gB, gE, 10);
+          drawPt(gB, 'B', '#f1f5f9', [-18, 10]); drawPt(gA, 'A', '#f1f5f9', [-18, -6]);
+          drawPt(gC, 'C', '#f1f5f9', [8, 14]); drawPt(gE, 'E', '#f1f5f9', [4, -12]);
+          drawPt(gF, 'F', '#fb923c', [-18, -8]); drawPt(gM_be, 'M', '#38bdf8', [8, 8]);
+          drawPt(gD_ac, 'D', '#fbbf24', [-4, -14], 4); drawPt(gH, 'H', '#4ade80', [8, 8]);
+          drawText(-2, a + 1, 'l₁(AF)', '#fb923c', '10px');
+          const dLabelX = gD_ac[0] + n[0] * dl * 0.8;
+          const dLabelY = gD_ac[1] + n[1] * dl * 0.8;
+          drawText(1.5, 4.5, 'l₂', '#a78bfa', '10px');
+          drawText(a + 0.5, -1, 'l₃(CH)', '#38bdf8', '10px');
+        },
+        html: `
+          <h3><span class="step-icon">4</span> 第(2)②：完成证明</h3>
+          <div class="proof-content">
+            <p><strong>Step 1: 证 $FD = DH$</strong></p>
+            <p>过 $A$、$D$、$C$ 分别作直线 $\\perp BE$：</p>
+            <p>&bull; 过 $A$：即直线 $AF$（$l_1$）</p>
+            <p>&bull; 过 $D$：设为 $l_2$</p>
+            <p>&bull; 过 $C$：即直线 $CM$（$l_3$，$H$ 在其上）</p>
+            <br>
+            <p>$l_1 \\mathbin{/\\!/} l_2 \\mathbin{/\\!/} l_3$（三条平行线）</p>
+            <p>它们截直线 $AC$ 于 $A$、$D$、$C$</p>
+            <p>∵ $D$ 是 $AC$ 中点 ∴ $AD = DC$</p>
+            <br>
+            <p>同一组平行线截直线 $FH$ 于 $F$、$D$、$H$</p>
+            <p class="reason">（$D$ 在 $l_2$ 上，也在直线 $FH$ 上）</p>
+            <div class="key-eq">
+              由<strong>平行线等分线段定理</strong>：$FD = DH$
+            </div>
+            <br>
+            <p><strong>Step 2: HL 全等</strong></p>
+            <p>在 $\\text{Rt}\\triangle FMD$ 和 $\\text{Rt}\\triangle HMD$ 中：</p>
+            <p>&bull; $\\angle FMD = \\angle HMD = 90°$</p>
+            <p class="reason">（$FM$ 在 $BE$ 上，$MH \\perp BE$）</p>
+            <p>&bull; $FD = HD$（已证）</p>
+            <p>&bull; $MD = MD$（公共边）</p>
+            <div class="conclusion">
+              <strong>∴ $\\text{Rt}\\triangle FMD \\cong \\text{Rt}\\triangle HMD$ (HL)</strong><br>
+              <strong>∴ $MF = MH$ $\\blacksquare$</strong>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: '(3) 求AM\'范围 分析',
+        draw() {
+          drawBase();
+          drawAngle(gB, gA, gC, 24, '90°');
+          // 圆⊙E(3)
+          drawCircle(gE, 3, 'rgba(56,189,248,0.4)', 2, []);
+          // CE line
+          hlLine(gC, gE, 'rgba(251,146,60,0.3)', 4);
+          // BG⊥CE
+          const CE = [gE[0] - gC[0], gE[1] - gC[1]];
+          const CElen = Math.sqrt(CE[0] * CE[0] + CE[1] * CE[1]);
+          const CEu = [CE[0] / CElen, CE[1] / CElen];
+          const proj = gB[0] * CEu[0] + gB[1] * CEu[1] - gC[0] * CEu[0] - gC[1] * CEu[1];
+          const gG = [gC[0] + proj * CEu[0], gC[1] + proj * CEu[1]];
+          drawLine(gB, gG, '#a78bfa', 1.5, [3, 3]);
+          drawRA(gG, gB, gE, 8, '#a78bfa');
+          drawPt(gG, 'G', '#a78bfa', [6, -10]);
+          // 标注
+          const [cx, cy] = toC(...gC);
+          const [ex, ey] = toC(...gE);
+          ctx.fillStyle = '#fb923c'; ctx.font = '12px sans-serif';
+          ctx.fillText('CE=9', (cx + ex) / 2 - 15, (cy + ey) / 2 + 18);
+          ctx.fillStyle = '#a78bfa';
+          ctx.fillText('BG=4', toC(...gG)[0] - 40, toC(...gG)[1] - 5);
+          drawText(gE[0] - 0.5, gE[1] + 3.5, '⊙E(r=3)', '#38bdf8', '11px');
+          drawMark(gB, gA, '#fb923c'); drawMark(gB, gC, '#fb923c');
+        },
+        html: `
+          <h3><span class="step-icon">5</span> 第(3)题：分析条件</h3>
+          <div class="proof-content">
+            <p><strong>已知:</strong> $S_{\\triangle ABC} = 18$, $EM = 3$, $BG = 4$ ($BG \\perp CE$)</p>
+            <p>$BM' \\perp BM$, $BM' = BM$。求 $AM'$ 的取值范围。</p>
+            <br>
+            <p><strong>Step 1: 求基本量</strong></p>
+            <p>$S_{\\triangle ABC} = \\frac{1}{2}AB^2 = 18$ &nbsp;→&nbsp; $AB = BC = 6$</p>
+            <br>
+            <p><strong>Step 2: 求 $CE$</strong></p>
+            <p>$BG \\perp CE$, $BG = 4$（$B$ 到直线 $CE$ 的距离）</p>
+            <p>设 $E = (t, 6)$，$B = (0,0)$，$C = (6,0)$</p>
+            <p>$B$ 到 $CE$ 的距离 $= \\dfrac{|\\vec{BC} \\times \\vec{CE}|}{|CE|} = \\dfrac{36}{\\sqrt{(t-6)^2+36}} = 4$</p>
+            <p>解得 $(t-6)^2 = 45$</p>
+            <div class="key-eq">
+              $CE = \\sqrt{(t-6)^2 + 36} = \\sqrt{81} = 9$
+            </div>
+            <p><strong>Step 3: $M$ 的轨迹</strong></p>
+            <p>$EM = 3$ → $M$ 在以 $E$ 为圆心、半径 $3$ 的圆上</p>
+          </div>
+        `
+      },
+      {
+        title: '(3) 旋转变换',
+        draw() {
+          drawBase();
+          drawCircle(gE, 3, 'rgba(56,189,248,0.4)', 2, []);
+          // 取一个M点
+          const theta = -0.5;
+          const gM3 = [gE[0] + 3 * Math.cos(theta), gE[1] + 3 * Math.sin(theta)];
+          // M'逆时针90°
+          const gMp = [-gM3[1], gM3[0]];
+          drawLine(gB, gM3, '#fb923c', 2);
+          drawLine(gB, gMp, '#4ade80', 2);
+          drawRA(gB, gM3, gMp, 12, '#fbbf24');
+          drawLine(gA, gMp, '#f87171', 2.5);
+          drawLine(gC, gM3, '#f87171', 2.5, [4, 4]);
+          drawMark(gB, gM3, '#a78bfa'); drawMark(gB, gMp, '#a78bfa');
+          drawPt(gM3, 'M', '#fb923c', [8, -8]);
+          drawPt(gMp, "M'", '#4ade80', [8, -8]);
+          // 标注AM'和CM
+          drawText(gMp[0] / 2 - 2.5, (gMp[1] + a) / 2 + 0.5, "AM'", '#f87171', '12px');
+          drawText((gC[0] + gM3[0]) / 2 + 0.5, gM3[1] / 2, 'CM', '#f87171', '12px');
+          drawAngle(gB, gA, gC, 24, '90°');
+        },
+        html: `
+          <h3><span class="step-icon">6</span> 第(3)题：旋转变换（核心）</h3>
+          <div class="proof-content">
+            <p><strong>核心转化：</strong></p>
+            <p>$BM' \\perp BM$，$BM' = BM$</p>
+            <p>→ $M'$ 是 $M$ 绕 $B$ 旋转 $90°$ 的像</p>
+            <br>
+            <p><strong>利用旋转的等距性：</strong></p>
+            <div class="key-eq">
+              $AM' = |A - R(M)| = |R^{-1}(A) - M|$
+            </div>
+            <p class="reason">旋转是等距变换，$|P - R(Q)| = |R^{-1}(P) - Q|$</p>
+            <br>
+            <p>$A = (0, 6)$ 绕 $B = (0,0)$ 旋转 $-90°$：</p>
+            <p>$R^{-1}(A) = (6, 0) = C$</p>
+            <br>
+            <div class="conclusion">
+              <strong>∴ $AM' = CM$ ！</strong><br>
+              <strong>（$AM'$ 等价于 $M$ 到 $C$ 的距离）</strong>
+            </div>
+            <br>
+            <div class="warning">
+              💡 这个转化极其巧妙：$A$ 旋转 $-90°$ 恰好落在 $C$ 上（因为 $\\angle ABC=90°$，$AB=BC$），<br>
+              将求 $AM'$ 的问题转化为求 $CM$ 的问题！
+            </div>
+          </div>
+        `
+      },
+      {
+        title: '(3) 最终结果',
+        draw() {
+          drawBase();
+          // 圆
+          drawCircle(gE, 3, 'rgba(56,189,248,0.5)', 2.5, []);
+          // CE线
+          hlLine(gC, gE, 'rgba(251,146,60,0.4)', 4);
+          // 最近点和最远点
+          const CElen = 9;
+          const CEx = (gE[0] - gC[0]) / CElen, CEy = (gE[1] - gC[1]) / CElen;
+          const gMmin = [gE[0] - 3 * CEx, gE[1] - 3 * CEy]; // 最近M
+          const gMmax = [gE[0] + 3 * CEx, gE[1] + 3 * CEy]; // 最远M
+          hlLine(gC, gMmin, 'rgba(74,222,128,0.5)', 4);
+          hlLine(gC, gMmax, 'rgba(248,113,113,0.5)', 4);
+          drawPt(gMmin, 'M₁', '#4ade80', [4, 14]);
+          drawPt(gMmax, 'M₂', '#f87171', [4, -14]);
+          // 标注距离
+          drawText((gC[0] + gMmin[0]) / 2 - 3, (gC[1] + gMmin[1]) / 2 + 1.5, 'CM₁=6', '#4ade80', '12px');
+          drawText((gC[0] + gMmax[0]) / 2 + 1.5, (gC[1] + gMmax[1]) / 2, 'CM₂=12', '#f87171', '12px');
+          drawText(gE[0] - 1, gE[1] + 3.5, 'r=3', '#38bdf8', '11px');
+          // 最终答案
+          drawText(0, 10.5, "AM' ∈ [6, 12]", '#fbbf24', '16px');
+          drawAngle(gB, gA, gC, 24, '90°');
+        },
+        html: `
+          <h3><span class="step-icon">7</span> 第(3)题：最终结果</h3>
+          <div class="proof-content">
+            <p>由旋转变换：$AM' = CM$</p>
+            <br>
+            <p>$M$ 在以 $E$ 为圆心、半径 $3$ 的圆上运动</p>
+            <p>$CE = 9$（已求）</p>
+            <br>
+            <p>$CM$ 的最小值：$M$ 在线段 $CE$ 上（靠近 $C$ 端）</p>
+            <p>$CM_{\\min} = CE - EM = 9 - 3 = 6$</p>
+            <br>
+            <p>$CM$ 的最大值：$M$ 在 $CE$ 延长线上（远离 $C$ 端）</p>
+            <p>$CM_{\\max} = CE + EM = 9 + 3 = 12$</p>
+            <br>
+            <div class="conclusion">
+              <strong>∴ $AM'$ 的取值范围为 $\\boxed{6 \\leqslant AM' \\leqslant 12}$</strong>
+            </div>
+            <br>
+            <div class="warning">
+              💡 <strong>解题核心总结：</strong><br>
+              ① $S_{\\triangle ABC}=18$ → $AB=BC=6$<br>
+              ② $BG=4$ → $CE=9$（点到直线距离公式）<br>
+              ③ 旋转等距性 → $AM'=CM$（因为 $R^{-1}(A)=C$）<br>
+              ④ $M$ 在 $\\odot E(3)$ 上 → $CM \\in [CE-3, CE+3]=[6,12]$
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    let currentStep = 0;
+    function buildNav() {
+      const nav = document.getElementById('stepNav');
+      nav.innerHTML = '';
+      steps.forEach((s, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'step-btn' + (i === currentStep ? ' active' : (i < currentStep ? ' completed' : ''));
+        btn.textContent = '①②③④⑤⑥⑦⑧'[i] + ' ' + s.title;
+        btn.onclick = () => goToStep(i);
+        nav.appendChild(btn);
+      });
+    }
+    function goToStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      currentStep = idx;
+      buildNav();
+      ctx.clearRect(0, 0, W, H);
+      steps[currentStep].draw();
+      document.getElementById('proofPanel').innerHTML = steps[currentStep].html;
+      renderMathInElement(document.getElementById('proofPanel'), {
+        delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }]
+      });
+      document.getElementById('prevBtn').disabled = (currentStep === 0);
+      document.getElementById('nextBtn').disabled = (currentStep === steps.length - 1);
+      document.getElementById('navInfo').textContent = `步骤 ${currentStep + 1}/${steps.length}`;
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goToStep(currentStep + 1);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goToStep(currentStep - 1);
+    });
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMathInElement(document.querySelector('.problem-text'), {
+        delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }]
+      });
+      goToStep(0);
+    });
+  </script>
+</body>
+</html>

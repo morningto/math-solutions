@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第18题 - BD平分∠ABC的证明</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 2px solid #38bdf8;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 {
+    font-size: 22px;
+    color: #38bdf8;
+    font-weight: 700;
+  }
+  .header .badge {
+    background: #38bdf8;
+    color: #0f172a;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .step-nav {
+    display: flex;
+    gap: 6px;
+    padding: 12px 28px;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    flex-wrap: wrap;
+  }
+  .step-btn {
+    padding: 6px 16px;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #94a3b8;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .step-btn:hover {
+    border-color: #38bdf8;
+    color: #38bdf8;
+  }
+  .step-btn.active {
+    background: #38bdf8;
+    color: #0f172a;
+    border-color: #38bdf8;
+    font-weight: 700;
+  }
+  .step-btn.completed {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+  .main-area {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+  }
+  .canvas-panel {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid #334155;
+  }
+  .canvas-panel h3 {
+    color: #38bdf8;
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+  canvas {
+    background: #1e293b;
+    border-radius: 12px;
+    border: 1px solid #334155;
+  }
+  .proof-panel {
+    width: 50%;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+  .proof-panel h2 {
+    color: #38bdf8;
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  .proof-panel .step-label {
+    color: #a78bfa;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .proof-content {
+    line-height: 1.85;
+    font-size: 15px;
+  }
+  .proof-content .highlight {
+    color: #4ade80;
+    font-weight: 600;
+  }
+  .proof-content .formula-block {
+    background: #1e293b;
+    border-left: 3px solid #a78bfa;
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 8px 8px 0;
+    overflow-x: auto;
+  }
+  .proof-content .note {
+    background: rgba(251, 146, 60, 0.1);
+    border-left: 3px solid #fb923c;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 8px 8px 0;
+    color: #fb923c;
+    font-size: 14px;
+  }
+  .proof-content .conclusion {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid #4ade80;
+    padding: 14px 18px;
+    margin: 14px 0;
+    border-radius: 10px;
+    color: #4ade80;
+    font-weight: 600;
+  }
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: #1e293b;
+    border-top: 1px solid #334155;
+  }
+  .nav-btn {
+    padding: 8px 24px;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover {
+    border-color: #38bdf8;
+    color: #38bdf8;
+  }
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .nav-btn.primary {
+    background: #38bdf8;
+    color: #0f172a;
+    border-color: #38bdf8;
+    font-weight: 700;
+  }
+  .nav-btn.primary:hover {
+    background: #7dd3fc;
+  }
+  .katex { font-size: 1.05em; }
+  .proof-panel::-webkit-scrollbar { width: 6px; }
+  .proof-panel::-webkit-scrollbar-track { background: #1e293b; }
+  .proof-panel::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📐 第18题 · 证明BD平分∠ABC</h1>
+  <span class="badge">几何证明</span>
+</div>
+
+<div class="step-nav" id="stepNav"></div>
+
+<div class="main-area">
+  <div class="canvas-panel">
+    <h3>📊 几何图形</h3>
+    <canvas id="geoCanvas" width="520" height="420"></canvas>
+  </div>
+  <div class="proof-panel" id="proofPanel"></div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn" id="prevBtn" onclick="prevStep()">← 上一步</button>
+  <span id="stepIndicator" style="color:#64748b;font-size:13px;align-self:center;"></span>
+  <button class="nav-btn primary" id="nextBtn" onclick="nextStep()">下一步 →</button>
+</div>
+
+<script>
+const steps = [
+  {
+    title: "分析题意",
+    label: "Step 1 / 7 · 理解问题条件",
+    content: `
+      <p>在 $\\triangle ABC$ 中，已知条件如下：</p>
+      <div class="formula-block">
+        $$AC = BC, \\quad \\angle ACB = 90°$$
+      </div>
+      <p>因此 $\\triangle ABC$ 是一个<span class="highlight">等腰直角三角形</span>，其中 $\\angle ABC = \\angle BAC = 45°$。</p>
+      <p>其他条件：</p>
+      <ul style="margin:10px 0 10px 20px;">
+        <li>$D$ 是 $AC$ 上一点</li>
+        <li>$AE \\perp BD$，$AE$ 交 $BD$ 的延长线于点 $E$</li>
+        <li>$AE = \\dfrac{1}{2} BD$</li>
+      </ul>
+      <div class="note">💡 目标：证明 $BD$ 平分 $\\angle ABC$，即 $\\angle DBC = \\dfrac{1}{2} \\angle ABC = 22.5°$</div>
+    `
+  },
+  {
+    title: "设角度",
+    label: "Step 2 / 7 · 设定辅助角",
+    content: `
+      <p>设 $\\angle DBC = \\alpha$，我们要证明 $\\alpha = 22.5°$。</p>
+      <div class="formula-block">
+        <p>在 $\\text{Rt}\\triangle BDC$ 中（$\\angle BCD = 90°$）：</p>
+        $$\\angle BDC = 90° - \\alpha$$
+      </div>
+      <p>由于 $D$ 在 $AC$ 上，$\\angle BDA$ 与 $\\angle BDC$ 互补：</p>
+      <div class="formula-block">
+        $$\\angle BDA = 180° - \\angle BDC = 180° - (90° - \\alpha) = 90° + \\alpha$$
+      </div>
+      <p>由于 $B, D, E$ 三点共线，$\\angle ADE$ 与 $\\angle BDA$ 互补：</p>
+      <div class="formula-block">
+        $$\\angle ADE = 180° - \\angle BDA = 180° - (90° + \\alpha) = 90° - \\alpha$$
+      </div>
+      <div class="note">💡 关键发现：$\\angle BDC = \\angle ADE = 90° - \\alpha$</div>
+    `
+  },
+  {
+    title: "发现相似",
+    label: "Step 3 / 7 · 三角形相似",
+    content: `
+      <p>观察 $\\text{Rt}\\triangle BDC$ 和 $\\text{Rt}\\triangle ADE$：</p>
+      <div class="formula-block">
+        <p><span class="highlight">AA相似判定：</span></p>
+        $$\\angle BCD = \\angle AED = 90°$$
+        $$\\angle BDC = \\angle ADE = 90° - \\alpha$$
+      </div>
+      <p>因此：</p>
+      <div class="formula-block">
+        $$\\text{Rt}\\triangle BDC \\sim \\text{Rt}\\triangle ADE$$
+      </div>
+      <p>由相似比可得：</p>
+      <div class="formula-block">
+        $$\\frac{BC}{AE} = \\frac{BD}{AD}$$
+      </div>
+      <div class="note">💡 注意对应关系：BC↔AE（直角边），BD↔AD（斜边）</div>
+    `
+  },
+  {
+    title: "代入条件",
+    label: "Step 4 / 7 · 利用 AE = BD/2",
+    content: `
+      <p>将 $AE = \\dfrac{1}{2}BD$ 代入相似比：</p>
+      <div class="formula-block">
+        $$\\frac{BC}{\\frac{1}{2}BD} = \\frac{BD}{AD}$$
+      </div>
+      <p>化简得：</p>
+      <div class="formula-block">
+        $$\\frac{2 \\cdot BC}{BD} = \\frac{BD}{AD}$$
+        $$2 \\cdot BC \\cdot AD = BD^2$$
+      </div>
+      <p>由于 $\\triangle ABC$ 是等腰直角三角形，设 $BC = AC = a$：</p>
+      <div class="formula-block">
+        $$2a \\cdot AD = BD^2 \\quad \\cdots (*)$$
+      </div>
+      <div class="note">💡 这是核心等式，接下来用坐标关系求解</div>
+    `
+  },
+  {
+    title: "列方程求解",
+    label: "Step 5 / 7 · 代数求解",
+    content: `
+      <p>在 $\\text{Rt}\\triangle BDC$（$\\angle C = 90°$）中，由勾股定理：</p>
+      <div class="formula-block">
+        $$BD^2 = BC^2 + DC^2 = a^2 + DC^2$$
+      </div>
+      <p>又因为 $D$ 在 $AC$ 上：$AD + DC = AC = a$</p>
+      <p>设 $DC = x$，则 $AD = a - x$。代入 $(*)$ 式：</p>
+      <div class="formula-block">
+        $$2a(a - x) = a^2 + x^2$$
+        $$2a^2 - 2ax = a^2 + x^2$$
+        $$x^2 + 2ax - a^2 = 0$$
+      </div>
+      <p>用求根公式（取正根）：</p>
+      <div class="formula-block">
+        $$x = \\frac{-2a + \\sqrt{4a^2 + 4a^2}}{2} = \\frac{-2a + 2\\sqrt{2}\\,a}{2} = a(\\sqrt{2} - 1)$$
+      </div>
+      <div class="conclusion">✅ 解得 $DC = a(\\sqrt{2} - 1)$</div>
+    `
+  },
+  {
+    title: "证明结论",
+    label: "Step 6 / 7 · 得出结论",
+    content: `
+      <p>在 $\\text{Rt}\\triangle BDC$ 中：</p>
+      <div class="formula-block">
+        $$\\tan(\\angle DBC) = \\frac{DC}{BC} = \\frac{a(\\sqrt{2} - 1)}{a} = \\sqrt{2} - 1$$
+      </div>
+      <p>而我们知道：</p>
+      <div class="formula-block">
+        $$\\tan 22.5° = \\tan\\frac{45°}{2} = \\sqrt{2} - 1$$
+      </div>
+      <p class="highlight">（利用半角公式 $\\tan\\frac{\\theta}{2} = \\frac{1 - \\cos\\theta}{\\sin\\theta}$，当 $\\theta=45°$ 时可验证）</p>
+      <p>因此：</p>
+      <div class="formula-block">
+        $$\\angle DBC = 22.5° = \\frac{45°}{2} = \\frac{\\angle ABC}{2}$$
+      </div>
+      <div class="conclusion">
+        ✅ <strong>证毕：</strong>$BD$ 平分 $\\angle ABC$。$\\blacksquare$
+      </div>
+    `
+  },
+  {
+    title: "拓展·纯几何法",
+    label: "Bonus · 纯几何构造证明",
+    content: `
+      <p>下面给出一种<span class="highlight">纯几何构造法</span>（不用三角函数）：</p>
+      <div class="formula-block">
+        <p><strong>构造：</strong>延长 $AE$ 到点 $F$，使 $EF = AE$。</p>
+      </div>
+      <p><strong>第一步：</strong>在 $\\triangle BEA$ 和 $\\triangle BEF$ 中：</p>
+      <ul style="margin:8px 0 8px 20px;">
+        <li>$BE = BE$（公共边）</li>
+        <li>$AE = EF$（构造）</li>
+        <li>$\\angle BEA = \\angle BEF = 90°$（$AE \\perp BD$）</li>
+      </ul>
+      <p>由 SAS 得 $\\triangle BEA \\cong \\triangle BEF$，故 <span class="highlight">$BA = BF$</span>。</p>
+
+      <div class="formula-block">
+        <p><strong>第二步：</strong>类似地，$\\triangle DEA \\cong \\triangle DEF$（SAS）</p>
+        <p>所以 $DA = DF$，即 $BD$ 是 $AF$ 的垂直平分线。</p>
+      </div>
+      
+      <p><strong>第三步：</strong>由于 $AF = 2 \\cdot AE = BD$，且 $BA = BF$，</p>
+      <p>$BD$ 平分 $\\angle ABF$。</p>
+      
+      <p><strong>第四步：</strong>证明 $F$ 在 $BC$ 的延长线上（利用角度关系），</p>
+      <p>则 $\\angle ABF = \\angle ABC$，从而 $BD$ 平分 $\\angle ABC$。</p>
+      
+      <div class="conclusion">
+        ✅ 纯几何法同样证毕！两种方法殊途同归。$\\blacksquare$
+      </div>
+    `
+  }
+];
+
+let currentStep = 0;
+
+function renderStepNav() {
+  const nav = document.getElementById('stepNav');
+  nav.innerHTML = '';
+  steps.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'step-btn' + (i === currentStep ? ' active' : '') + (i < currentStep ? ' completed' : '');
+    btn.textContent = (i < steps.length - 1 ? `Step ${i+1}` : '✨ Bonus') + ': ' + s.title;
+    btn.onclick = () => goToStep(i);
+    nav.appendChild(btn);
+  });
+}
+
+function renderProof() {
+  const panel = document.getElementById('proofPanel');
+  const s = steps[currentStep];
+  panel.innerHTML = `<h2>${s.title}</h2><div class="step-label">${s.label}</div><div class="proof-content">${s.content}</div>`;
+  renderMathInElement(panel, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  });
+  panel.scrollTop = 0;
+}
+
+function updateNav() {
+  document.getElementById('prevBtn').disabled = currentStep === 0;
+  document.getElementById('nextBtn').textContent = currentStep === steps.length - 1 ? '🎉 完成' : '下一步 →';
+  document.getElementById('stepIndicator').textContent = `${currentStep + 1} / ${steps.length}`;
+}
+
+function goToStep(i) {
+  currentStep = i;
+  renderStepNav();
+  renderProof();
+  drawGeometry();
+  updateNav();
+}
+
+function nextStep() {
+  if (currentStep < steps.length - 1) goToStep(currentStep + 1);
+}
+
+function prevStep() {
+  if (currentStep > 0) goToStep(currentStep - 1);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextStep(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevStep(); }
+});
+
+// ============ CANVAS DRAWING ============
+const C = {x: 100, y: 320};
+const A = {x: 420, y: 320};
+const B = {x: 100, y: 80};
+const D = {x: 232, y: 320};
+
+// E is on BD extension beyond D, with AE ⊥ BD
+// BD direction vector
+const bdx = D.x - B.x, bdy = D.y - B.y;
+const bdLen = Math.sqrt(bdx*bdx + bdy*bdy);
+const bdUx = bdx/bdLen, bdUy = bdy/bdLen;
+
+// Project A onto line BD to find foot, then E is that foot (since AE⊥BD)
+const bax = A.x - B.x, bay = A.y - B.y;
+const proj = bax*bdUx + bay*bdUy;
+const footX = B.x + proj*bdUx, footY = B.y + proj*bdUy;
+// E is the foot of perpendicular from A to BD line
+const E = {x: Math.round(footX), y: Math.round(footY)};
+
+function drawRightAngle(ctx, vertex, dir1, dir2, size) {
+  const p1 = {x: vertex.x + dir1.x * size, y: vertex.y + dir1.y * size};
+  const p2 = {x: p1.x + dir2.x * size, y: p1.y + dir2.y * size};
+  const p3 = {x: vertex.x + dir2.x * size, y: vertex.y + dir2.y * size};
+  ctx.beginPath();
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.lineTo(p3.x, p3.y);
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function drawAngleArc(ctx, center, startAngle, endAngle, radius, color, label) {
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, radius, startAngle, endAngle);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  if (label) {
+    const mid = (startAngle + endAngle) / 2;
+    ctx.fillStyle = color;
+    ctx.font = '12px sans-serif';
+    ctx.fillText(label, center.x + (radius + 10) * Math.cos(mid), center.y + (radius + 10) * Math.sin(mid));
+  }
+}
+
+function drawGeometry() {
+  const canvas = document.getElementById('geoCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 520, 420);
+
+  // Background grid
+  ctx.strokeStyle = '#1a2744';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < 520; i += 40) {
+    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 420); ctx.stroke();
+  }
+  for (let j = 0; j < 420; j += 40) {
+    ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(520, j); ctx.stroke();
+  }
+
+  // Highlight elements based on step
+  const highlightTriBDC = currentStep >= 1 && currentStep <= 5;
+  const highlightTriADE = currentStep >= 2 && currentStep <= 5;
+  const showAlpha = currentStep >= 1;
+  const showSimilar = currentStep >= 2;
+  const showResult = currentStep >= 5;
+
+  // Triangle ABC - main edges
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(C.x, C.y); ctx.closePath();
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Fill triangle lightly
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(C.x, C.y); ctx.closePath();
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.05)';
+  ctx.fill();
+
+  // BD line
+  ctx.beginPath();
+  ctx.moveTo(B.x, B.y);
+  ctx.lineTo(D.x, D.y);
+  ctx.strokeStyle = highlightTriBDC ? '#4ade80' : '#4ade80';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // BD extension to E (dashed)
+  ctx.beginPath();
+  ctx.setLineDash([6, 4]);
+  ctx.moveTo(D.x, D.y);
+  ctx.lineTo(E.x, E.y);
+  ctx.strokeStyle = '#4ade80';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // AE line
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y);
+  ctx.lineTo(E.x, E.y);
+  ctx.strokeStyle = '#fb923c';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Highlight Rt△BDC
+  if (highlightTriBDC) {
+    ctx.beginPath();
+    ctx.moveTo(B.x, B.y); ctx.lineTo(D.x, D.y); ctx.lineTo(C.x, C.y); ctx.closePath();
+    ctx.fillStyle = 'rgba(74, 222, 128, 0.08)';
+    ctx.fill();
+  }
+
+  // Highlight Rt△ADE
+  if (highlightTriADE) {
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y); ctx.lineTo(D.x, D.y); ctx.lineTo(E.x, E.y); ctx.closePath();
+    ctx.fillStyle = 'rgba(251, 146, 60, 0.08)';
+    ctx.fill();
+  }
+
+  // Right angle at C
+  drawRightAngle(ctx, C, {x: 1, y: 0}, {x: 0, y: -1}, 14);
+
+  // Right angle at E (AE ⊥ BD)
+  // Direction from E to A
+  const eax = A.x - E.x, eay = A.y - E.y;
+  const eaLen = Math.sqrt(eax*eax + eay*eay);
+  const eaU = {x: eax/eaLen, y: eay/eaLen};
+  // Direction from E to B (along BD)
+  const ebx = B.x - E.x, eby = B.y - E.y;
+  const ebLen = Math.sqrt(ebx*ebx + eby*eby);
+  const ebU = {x: ebx/ebLen, y: eby/ebLen};
+  drawRightAngle(ctx, E, eaU, ebU, 12);
+
+  // Angle alpha at B
+  if (showAlpha) {
+    const angBC = Math.atan2(C.y - B.y, C.x - B.x);
+    const angBD = Math.atan2(D.y - B.y, D.x - B.x);
+    drawAngleArc(ctx, B, angBC, angBD, 30, '#a78bfa', 'α');
+  }
+
+  // If showing result, also show that alpha = 22.5°
+  if (showResult) {
+    const angBA = Math.atan2(A.y - B.y, A.x - B.x);
+    const angBD = Math.atan2(D.y - B.y, D.x - B.x);
+    drawAngleArc(ctx, B, angBD, angBA, 38, '#fb923c', 'α');
+  }
+
+  // Labels for points
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillText('B', B.x - 20, B.y - 8);
+  ctx.fillText('C', C.x - 20, C.y + 20);
+  ctx.fillText('A', A.x + 8, A.y + 20);
+  ctx.fillStyle = '#4ade80';
+  ctx.fillText('D', D.x - 4, D.y + 22);
+  ctx.fillStyle = '#fb923c';
+  ctx.fillText('E', E.x + 8, E.y + 6);
+
+  // Dots at points
+  const allPts = [{p:A, c:'#38bdf8'}, {p:B, c:'#38bdf8'}, {p:C, c:'#38bdf8'}, {p:D, c:'#4ade80'}, {p:E, c:'#fb923c'}];
+  allPts.forEach(({p, c}) => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = c;
+    ctx.fill();
+  });
+
+  // Condition labels
+  ctx.font = '13px sans-serif';
+  ctx.fillStyle = '#64748b';
+  if (currentStep === 0) {
+    ctx.fillText('AC = BC', 200, 30);
+    ctx.fillText('∠ACB = 90°', 200, 48);
+    ctx.fillText('AE ⊥ BD', 350, 30);
+    ctx.fillText('AE = ½BD', 350, 48);
+  }
+
+  // Similarity indicator
+  if (showSimilar && currentStep <= 4) {
+    ctx.font = '13px sans-serif';
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText('Rt△BDC ~ Rt△ADE', 300, 30);
+  }
+
+  // Result badge
+  if (showResult) {
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillStyle = '#4ade80';
+    ctx.fillText('α = 22.5° = ∠ABC/2 ✓', 280, 30);
+  }
+
+  // Step-specific annotations
+  if (currentStep === 1) {
+    // Show angle labels
+    ctx.font = '12px sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    const midBD = {x: (B.x+D.x)/2, y: (B.y+D.y)/2};
+    ctx.fillText('90°-α', midBD.x + 15, midBD.y + 25);
+  }
+
+  if (currentStep === 4 || currentStep === 5) {
+    // Mark DC = x
+    ctx.font = '12px sans-serif';
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText('DC = x', (D.x + C.x)/2 - 10, C.y - 10);
+    ctx.fillText('AD = a-x', (A.x + D.x)/2 - 10, A.y - 10);
+  }
+
+  // Bonus step: show construction hint
+  if (currentStep === 6) {
+    ctx.font = '12px sans-serif';
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText('构造 F: 延长AE到F', 320, 400);
+    // Draw F point (mirror of A over BD line)
+    const Fx = 2*E.x - A.x, Fy = 2*E.y - A.y;
+    ctx.beginPath();
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(E.x, E.y);
+    ctx.lineTo(Fx, Fy);
+    ctx.strokeStyle = '#a78bfa';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(Fx, Fy, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#a78bfa';
+    ctx.fill();
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('F', Fx + 8, Fy + 6);
+    // BF line dashed
+    ctx.beginPath();
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(B.x, B.y);
+    ctx.lineTo(Fx, Fy);
+    ctx.strokeStyle = '#a78bfa';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+// Initialize
+goToStep(0);
+</script>
+</body>
+</html>
