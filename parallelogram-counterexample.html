@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一组对边相等、一组对角相等的四边形是否是平行四边形？</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-purple: #a78bfa;
+      --accent-red: #f87171;
+      --accent-cyan: #22d3ee;
+      --line-color: #38bdf8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+      padding: 16px 24px;
+    }
+    .header h1 {
+      font-size: 1.3em;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+    }
+    .header .subtitle {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .step-nav {
+      display: flex;
+      gap: 6px;
+      padding: 12px 24px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
+    .step-btn {
+      background: var(--bg-tertiary);
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85em;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+    .step-btn.active {
+      background: var(--accent-blue);
+      color: var(--bg-primary);
+      font-weight: 600;
+    }
+    .step-btn:hover:not(.active) {
+      background: #475569;
+    }
+
+    .main-area {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 145px);
+    }
+    .canvas-panel {
+      flex: 0 0 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--bg-tertiary);
+      position: relative;
+    }
+    .proof-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: var(--bg-secondary);
+    }
+
+    .proof-panel h2 {
+      color: var(--accent-blue);
+      font-size: 1.15em;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    .proof-panel p, .proof-panel li {
+      color: var(--text-primary);
+      line-height: 1.8;
+      font-size: 0.95em;
+      margin-bottom: 8px;
+    }
+    .proof-panel .highlight {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 3px solid var(--accent-blue);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 12px 0;
+    }
+    .proof-panel .conclusion {
+      background: rgba(74, 222, 128, 0.1);
+      border-left: 3px solid var(--accent-green);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+    }
+    .proof-panel .warning {
+      background: rgba(248, 113, 113, 0.1);
+      border-left: 3px solid var(--accent-red);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+    }
+    .proof-panel .key-point {
+      background: rgba(251, 146, 60, 0.1);
+      border-left: 3px solid var(--accent-orange);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 12px 0;
+    }
+    .proof-panel ul { padding-left: 20px; }
+    .proof-panel .katex { font-size: 1.1em; }
+
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 24px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--bg-tertiary);
+    }
+    .nav-btn {
+      background: var(--accent-blue);
+      color: var(--bg-primary);
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .nav-btn:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+    .nav-info {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .check-mark {
+      color: var(--accent-green);
+      font-weight: bold;
+    }
+    .cross-mark {
+      color: var(--accent-red);
+      font-weight: bold;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+    }
+    th, td {
+      padding: 8px 12px;
+      border: 1px solid var(--bg-tertiary);
+      text-align: center;
+    }
+    th {
+      background: var(--bg-tertiary);
+      color: var(--accent-blue);
+    }
+
+    @media (max-width: 768px) {
+      .main-area { flex-direction: column; }
+      .canvas-panel { flex: 0 0 45%; border-right: none; border-bottom: 1px solid var(--bg-tertiary); }
+      .proof-panel { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📐 一组对边相等、一组对角相等的四边形，是不是平行四边形？</h1>
+    <div class="subtitle">初中几何 · 平行四边形判定条件辨析</div>
+  </div>
+
+  <div class="step-nav" id="stepNav"></div>
+
+  <div class="main-area">
+    <div class="canvas-panel">
+      <canvas id="canvas" width="600" height="500"></canvas>
+    </div>
+    <div class="proof-panel" id="proofPanel"></div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-btn" id="prevBtn" onclick="goToStep(currentStep-1)">◀ 上一步</button>
+    <span class="nav-info" id="navInfo"></span>
+    <button class="nav-btn" id="nextBtn" onclick="goToStep(currentStep+1)">下一步 ▶</button>
+  </div>
+
+  <script>
+    // ============ Config ============
+    const sq3 = Math.sqrt(3);
+    const dpr = window.devicePixelRatio || 1;
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // HiDPI setup
+    const W = 600, H = 500;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.scale(dpr, dpr);
+
+    // ============ Geometry ============
+    // Counterexample coordinates (math space)
+    const mathPoints = {
+      A: [0, 0],
+      B: [6, 0],
+      C: [46/7, 16*sq3/7],
+      D: [1, sq3]
+    };
+
+    // Parallelogram (for comparison)
+    const paraPoints = {
+      A: [0, 0],
+      B: [6, 0],
+      C: [7, sq3],
+      D: [1, sq3]
+    };
+
+    // Transform: math → canvas
+    function toCanvas(pt, offsetX, offsetY, scale) {
+      offsetX = offsetX || 80;
+      offsetY = offsetY || 380;
+      scale = scale || 55;
+      return [offsetX + pt[0] * scale, offsetY - pt[1] * scale];
+    }
+
+    // ============ Drawing Helpers ============
+    function clearCanvas() {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawSegment(p1, p2, color, lineWidth, dashed) {
+      ctx.beginPath();
+      ctx.strokeStyle = color || '#38bdf8';
+      ctx.lineWidth = lineWidth || 2;
+      if (dashed) ctx.setLineDash(dashed);
+      else ctx.setLineDash([]);
+      ctx.moveTo(p1[0], p1[1]);
+      ctx.lineTo(p2[0], p2[1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawPoint(pt, label, color, offsetX, offsetY) {
+      ctx.beginPath();
+      ctx.fillStyle = color || '#f1f5f9';
+      ctx.arc(pt[0], pt[1], 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = 'bold 16px -apple-system, sans-serif';
+      ctx.fillStyle = color || '#f1f5f9';
+      ctx.fillText(label, pt[0] + (offsetX || 8), pt[1] + (offsetY || -10));
+    }
+
+    function drawAngleArc(center, v1, v2, radius, color, label) {
+      let a1 = Math.atan2(v1[1] - center[1], v1[0] - center[0]);
+      let a2 = Math.atan2(v2[1] - center[1], v2[0] - center[0]);
+      // Always draw the interior angle (counterclockwise from a1 to a2)
+      ctx.beginPath();
+      ctx.strokeStyle = color || '#fb923c';
+      ctx.lineWidth = 2;
+      ctx.arc(center[0], center[1], radius || 25, a1, a2, false);
+      ctx.stroke();
+      if (label) {
+        let mid = (a1 + a2) / 2;
+        // Handle angle wrapping
+        if (a2 < a1) mid = (a1 + a2 + 2*Math.PI) / 2;
+        let r = (radius || 25) + 14;
+        ctx.font = '13px -apple-system, sans-serif';
+        ctx.fillStyle = color || '#fb923c';
+        ctx.fillText(label, center[0] + r * Math.cos(mid) - 8, center[1] + r * Math.sin(mid) + 4);
+      }
+    }
+
+    function drawEqualMark(p1, p2, count, color) {
+      let mx = (p1[0]+p2[0])/2, my = (p1[1]+p2[1])/2;
+      let dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+      let len = Math.sqrt(dx*dx+dy*dy);
+      let nx = -dy/len, ny = dx/len;
+      let tx = dx/len, ty = dy/len;
+      ctx.strokeStyle = color || '#4ade80';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < count; i++) {
+        let offset = (i - (count-1)/2) * 6;
+        let cx = mx + offset*tx, cy = my + offset*ty;
+        ctx.beginPath();
+        ctx.moveTo(cx - 5*nx, cy - 5*ny);
+        ctx.lineTo(cx + 5*nx, cy + 5*ny);
+        ctx.stroke();
+      }
+    }
+
+    function drawMidLabel(p1, p2, text, color, offset) {
+      let mx = (p1[0]+p2[0])/2, my = (p1[1]+p2[1])/2;
+      let dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+      let len = Math.sqrt(dx*dx+dy*dy);
+      let nx = -dy/len, ny = dx/len;
+      let d = offset || 18;
+      ctx.font = '13px -apple-system, sans-serif';
+      ctx.fillStyle = color || '#94a3b8';
+      ctx.fillText(text, mx + d*nx - 8, my + d*ny + 4);
+    }
+
+    function drawQuad(pts, fillColor, strokeColor) {
+      let keys = ['A','B','C','D'];
+      ctx.beginPath();
+      let p0 = toCanvas(pts[keys[0]]);
+      ctx.moveTo(p0[0], p0[1]);
+      for (let i = 1; i < 4; i++) {
+        let p = toCanvas(pts[keys[i]]);
+        ctx.lineTo(p[0], p[1]);
+      }
+      ctx.closePath();
+      if (fillColor) {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      }
+      ctx.strokeStyle = strokeColor || '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // ============ Steps ============
+    const steps = [
+      {
+        title: '① 题目分析',
+        content: `
+          <h2>步骤 1：理解题意</h2>
+          <div class="highlight">
+            <p><strong>题目：</strong>一组对边相等，一组对角相等的四边形，是不是平行四边形？</p>
+          </div>
+          <p>在四边形 $ABCD$ 中：</p>
+          <ul>
+            <li><strong>对边</strong>：$AB$ 与 $CD$，$BC$ 与 $DA$</li>
+            <li><strong>对角</strong>：$\\angle A$ 与 $\\angle C$，$\\angle B$ 与 $\\angle D$</li>
+          </ul>
+          <p>题目条件：$AB = CD$（一组对边相等）且 $\\angle A = \\angle C$（一组对角相等）</p>
+          <div class="key-point">
+            <p>⚠️ 注意这个条件和平行四边形的判定条件的区别！</p>
+            <p>平行四边形的判定需要：</p>
+            <ul>
+              <li>两组对边<strong>分别</strong>相等，或</li>
+              <li>两组对角<strong>分别</strong>相等，或</li>
+              <li>一组对边<strong>平行且相等</strong></li>
+            </ul>
+            <p>而本题只有"一组对边相等 + 一组对角相等"，条件更弱。</p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+          // Draw generic quad with question marks
+          let pts = {A:[0,0], B:[6,0], C:[7,3], D:[1,3]};
+          drawQuad(pts, 'rgba(56,189,248,0.08)', '#38bdf8');
+          let labels = {A:[-15,15], B:[10,15], C:[10,-12], D:[-15,-12]};
+          for (let k of ['A','B','C','D']) {
+            let p = toCanvas(pts[k]);
+            drawPoint(p, k, '#f1f5f9', labels[k][0], labels[k][1]);
+          }
+          // Mark AB=CD
+          let pA=toCanvas(pts.A), pB=toCanvas(pts.B), pC=toCanvas(pts.C), pD=toCanvas(pts.D);
+          drawEqualMark(pA, pB, 1, '#4ade80');
+          drawEqualMark(pC, pD, 1, '#4ade80');
+          // Mark angles
+          drawAngleArc(pA, pB, pD, 28, '#fb923c', '∠A');
+          drawAngleArc(pC, pD, pB, 28, '#fb923c', '∠C');
+
+          // Question mark
+          ctx.font = 'bold 40px -apple-system, sans-serif';
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillText('?', W/2 - 12, 60);
+          ctx.font = '18px -apple-system, sans-serif';
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillText('是平行四边形吗？', W/2 - 72, 90);
+        }
+      },
+      {
+        title: '② 回顾判定定理',
+        content: `
+          <h2>步骤 2：平行四边形的判定定理</h2>
+          <p>平行四边形有 <strong>5 种</strong> 判定方法：</p>
+          <div class="table-wrap">
+          <table>
+            <tr><th>#</th><th>条件</th><th>结论</th></tr>
+            <tr><td>1</td><td>两组对边分别平行</td><td>✅ 平行四边形</td></tr>
+            <tr><td>2</td><td>两组对边分别相等</td><td>✅ 平行四边形</td></tr>
+            <tr><td>3</td><td>一组对边平行且相等</td><td>✅ 平行四边形</td></tr>
+            <tr><td>4</td><td>两组对角分别相等</td><td>✅ 平行四边形</td></tr>
+            <tr><td>5</td><td>对角线互相平分</td><td>✅ 平行四边形</td></tr>
+          </table>
+          </div>
+          <div class="warning">
+            <p>❌ <strong>以下条件不能判定平行四边形：</strong></p>
+            <ul>
+              <li>一组对边相等 + 一组对角相等</li>
+              <li>一组对边相等 + 一组对边平行（不是同一组！）</li>
+            </ul>
+            <p>这些是常见的<strong>伪条件</strong>，考试中经常出题考察！</p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+          // Draw 5 small parallelograms showing the 5 conditions
+          ctx.font = 'bold 16px -apple-system, sans-serif';
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillText('平行四边形的 5 种判定', W/2 - 100, 30);
+
+          const miniQuads = [
+            { label: '①两组对边平行', x: 60, y: 100, marks: 'parallel' },
+            { label: '②两组对边相等', x: 330, y: 100, marks: 'equal' },
+            { label: '③一组对边平行且相等', x: 60, y: 250, marks: 'pande' },
+            { label: '④两组对角相等', x: 330, y: 250, marks: 'angles' },
+            { label: '⑤对角线互相平分', x: 195, y: 400, marks: 'diag' },
+          ];
+
+          for (let mq of miniQuads) {
+            let s = 22;
+            let ox = mq.x, oy = mq.y;
+            let pts = [[ox,oy+50],[ox+5*s,oy+50],[ox+5*s+1.2*s,oy+50-2.5*s],[ox+1.2*s,oy+50-2.5*s]];
+            ctx.beginPath();
+            ctx.moveTo(pts[0][0],pts[0][1]);
+            for (let i=1;i<4;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+            ctx.closePath();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(56,189,248,0.05)';
+            ctx.fill();
+
+            ctx.font = '12px -apple-system, sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText(mq.label, ox, oy - 8);
+
+            if (mq.marks === 'parallel') {
+              drawMidLabel(pts[0],pts[1],'//','#4ade80',12);
+              drawMidLabel(pts[2],pts[3],'//','#4ade80',-12);
+              drawMidLabel(pts[1],pts[2],'//','#a78bfa',12);
+              drawMidLabel(pts[3],pts[0],'//','#a78bfa',-12);
+            } else if (mq.marks === 'equal') {
+              drawEqualMark(pts[0],pts[1],1,'#4ade80');
+              drawEqualMark(pts[2],pts[3],1,'#4ade80');
+              drawEqualMark(pts[1],pts[2],2,'#a78bfa');
+              drawEqualMark(pts[3],pts[0],2,'#a78bfa');
+            } else if (mq.marks === 'pande') {
+              drawMidLabel(pts[0],pts[1],'//=','#4ade80',12);
+              drawMidLabel(pts[2],pts[3],'//=','#4ade80',-12);
+            } else if (mq.marks === 'angles') {
+              drawAngleArc(pts[0],[pts[0][0]+30,pts[0][1]],pts[3],14,'#fb923c');
+              drawAngleArc(pts[2],pts[3],pts[1],14,'#fb923c');
+              drawAngleArc(pts[1],pts[2],[pts[1][0]-30,pts[1][1]],14,'#a78bfa');
+              drawAngleArc(pts[3],[pts[3][0]-30,pts[3][1]],pts[0],14,'#a78bfa');
+            } else if (mq.marks === 'diag') {
+              drawSegment(pts[0],pts[2],'#4ade80',1.5,[5,3]);
+              drawSegment(pts[1],pts[3],'#a78bfa',1.5,[5,3]);
+              let mx=(pts[0][0]+pts[2][0])/2, my=(pts[0][1]+pts[2][1])/2;
+              ctx.beginPath();
+              ctx.fillStyle='#fbbf24';
+              ctx.arc(mx,my,4,0,Math.PI*2);
+              ctx.fill();
+            }
+
+            ctx.font = 'bold 13px -apple-system, sans-serif';
+            ctx.fillStyle = '#4ade80';
+            ctx.fillText('✓', ox + 5*s + 30, oy + 25);
+          }
+        }
+      },
+      {
+        title: '③ 构造反例',
+        content: `
+          <h2>步骤 3：构造反例</h2>
+          <p>要证明"不一定"，只需<strong>找到一个反例</strong>：满足条件但不是平行四边形。</p>
+          <div class="highlight">
+            <p><strong>构造思路：</strong></p>
+            <ol>
+              <li>取 $A=(0,0)$，$B=(6,0)$，使得 $AB=6$</li>
+              <li>取 $D=(1,\\sqrt{3})$，使得 $\\angle DAB = 60°$</li>
+              <li>在 $CD=6$ 且 $\\angle BCD=60°$ 的约束下求 $C$ 的坐标</li>
+              <li>解方程得到 $C=\\left(\\dfrac{46}{7},\\, \\dfrac{16\\sqrt{3}}{7}\\right)$</li>
+            </ol>
+          </div>
+          <p>这个四边形满足：</p>
+          <ul>
+            <li>$AB = CD = 6$ <span class="check-mark">✓</span>（一组对边相等）</li>
+            <li>$\\angle A = \\angle C = 60°$ <span class="check-mark">✓</span>（一组对角相等）</li>
+          </ul>
+          <p>但是：</p>
+          <ul>
+            <li>$DA = 2$，$BC = 4$，$DA \\neq BC$ <span class="cross-mark">✗</span></li>
+            <li>$AB$ 不平行于 $CD$ <span class="cross-mark">✗</span></li>
+          </ul>
+          <div class="conclusion">
+            <p>✅ <strong>因此它不是平行四边形！</strong></p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+          // Draw the counterexample quad
+          drawQuad(mathPoints, 'rgba(56,189,248,0.08)', '#38bdf8');
+
+          let pA = toCanvas(mathPoints.A);
+          let pB = toCanvas(mathPoints.B);
+          let pC = toCanvas(mathPoints.C);
+          let pD = toCanvas(mathPoints.D);
+
+          drawPoint(pA, 'A', '#f1f5f9', -18, 18);
+          drawPoint(pB, 'B', '#f1f5f9', 10, 18);
+          drawPoint(pC, 'C', '#f1f5f9', 10, -8);
+          drawPoint(pD, 'D', '#f1f5f9', -18, -8);
+
+          // Mark equal sides
+          drawEqualMark(pA, pB, 1, '#4ade80');
+          drawEqualMark(pC, pD, 1, '#4ade80');
+          drawMidLabel(pA, pB, '6', '#4ade80', 18);
+          drawMidLabel(pC, pD, '6', '#4ade80', -22);
+
+          // Mark unequal sides
+          drawMidLabel(pA, pD, '2', '#f87171', -18);
+          drawMidLabel(pB, pC, '4', '#f87171', 18);
+
+          // Mark equal angles
+          drawAngleArc(pA, pB, pD, 30, '#fb923c', '60°');
+          drawAngleArc(pC, pD, pB, 30, '#fb923c', '60°');
+
+          // Title
+          ctx.font = 'bold 16px -apple-system, sans-serif';
+          ctx.fillStyle = '#f87171';
+          ctx.fillText('反例：不是平行四边形！', W/2 - 100, 30);
+
+          // Show BC≠DA
+          ctx.font = '14px -apple-system, sans-serif';
+          ctx.fillStyle = '#f87171';
+          ctx.fillText('BC=4 ≠ DA=2', W/2 - 45, 55);
+        }
+      },
+      {
+        title: '④ 精确验证',
+        content: `
+          <h2>步骤 4：用坐标精确验证</h2>
+          <div class="highlight">
+            <p><strong>反例坐标：</strong></p>
+            <p>$A=(0,\\,0)$，$B=(6,\\,0)$，$D=(1,\\,\\sqrt{3})$，$C=\\left(\\dfrac{46}{7},\\,\\dfrac{16\\sqrt{3}}{7}\\right)$</p>
+          </div>
+          <p><strong>验证 $AB = CD = 6$：</strong></p>
+          <p>$$AB = 6$$</p>
+          <p>$$CD = \\sqrt{\\left(\\frac{46}{7}-1\\right)^2 + \\left(\\frac{16\\sqrt{3}}{7}-\\sqrt{3}\\right)^2} = \\sqrt{\\left(\\frac{39}{7}\\right)^2 + \\left(\\frac{9\\sqrt{3}}{7}\\right)^2}$$</p>
+          <p>$$= \\sqrt{\\frac{1521+243}{49}} = \\sqrt{\\frac{1764}{49}} = \\sqrt{36} = 6 \\;✓$$</p>
+
+          <p><strong>验证 $\\angle A = \\angle C = 60°$：</strong></p>
+          <p>$\\vec{AB}=(6,0)$，$\\vec{AD}=(1,\\sqrt{3})$</p>
+          <p>$$\\cos\\angle A = \\frac{\\vec{AB}\\cdot\\vec{AD}}{|\\vec{AB}||\\vec{AD}|} = \\frac{6}{6\\times 2} = \\frac{1}{2} \\implies \\angle A = 60° \\;✓$$</p>
+
+          <p>$$\\cos\\angle C = \\frac{\\vec{CB}\\cdot\\vec{CD}}{|\\vec{CB}||\\vec{CD}|} = \\frac{1}{2} \\implies \\angle C = 60° \\;✓$$</p>
+
+          <p><strong>验证不是平行四边形：</strong></p>
+          <p>$DA = |\\vec{AD}| = \\sqrt{1+3} = 2$</p>
+          <p>$BC = \\left|\\vec{BC}\\right| = 4$</p>
+          <p>$$DA = 2 \\neq 4 = BC \\quad ✗$$</p>
+          <div class="conclusion">
+            <p>✅ 另一组对边不等，<strong>确认不是平行四边形</strong>。</p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+          // Draw with coordinates shown
+          drawQuad(mathPoints, 'rgba(56,189,248,0.05)', '#38bdf8');
+
+          let pA = toCanvas(mathPoints.A);
+          let pB = toCanvas(mathPoints.B);
+          let pC = toCanvas(mathPoints.C);
+          let pD = toCanvas(mathPoints.D);
+
+          // Draw coordinate axes lightly
+          ctx.strokeStyle = 'rgba(148,163,184,0.2)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3,3]);
+          ctx.beginPath(); ctx.moveTo(50, 380); ctx.lineTo(520, 380); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(80, 410); ctx.lineTo(80, 100); ctx.stroke();
+          ctx.setLineDash([]);
+
+          drawPoint(pA, 'A(0,0)', '#f1f5f9', -10, 25);
+          drawPoint(pB, 'B(6,0)', '#f1f5f9', 5, 25);
+          ctx.font = '12px -apple-system, sans-serif';
+          drawPoint(pC, '', '#f1f5f9', 10, -8);
+          ctx.fillStyle = '#f1f5f9';
+          ctx.fillText('C(46/7, 16√3/7)', pC[0]+8, pC[1]-10);
+          drawPoint(pD, 'D(1,√3)', '#f1f5f9', -80, -8);
+
+          // Equal marks
+          drawEqualMark(pA, pB, 1, '#4ade80');
+          drawEqualMark(pC, pD, 1, '#4ade80');
+          drawMidLabel(pA, pB, 'AB=6', '#4ade80', 22);
+          drawMidLabel(pC, pD, 'CD=6', '#4ade80', -26);
+          drawMidLabel(pA, pD, 'DA=2', '#f87171', -22);
+          drawMidLabel(pB, pC, 'BC=4', '#f87171', 22);
+
+          drawAngleArc(pA, pB, pD, 30, '#fb923c', '60°');
+          drawAngleArc(pC, pD, pB, 30, '#fb923c', '60°');
+
+          ctx.font = 'bold 14px -apple-system, sans-serif';
+          ctx.fillStyle = '#4ade80';
+          ctx.fillText('AB=CD=6 ✓  ∠A=∠C=60° ✓', W/2 - 110, 30);
+          ctx.fillStyle = '#f87171';
+          ctx.fillText('DA=2 ≠ BC=4  →  不是平行四边形 ✗', W/2 - 140, 55);
+        }
+      },
+      {
+        title: '⑤ 对比平行四边形',
+        content: `
+          <h2>步骤 5：与真正的平行四边形对比</h2>
+          <p>右侧图形展示了<strong>两个四边形的对比</strong>：</p>
+          <ul>
+            <li><span style="color:#38bdf8">■ 蓝色</span>：本题的反例（不是平行四边形）</li>
+            <li><span style="color:#4ade80">■ 绿色</span>：真正的平行四边形（$AB//DC$ 且 $AB=DC=6$）</li>
+          </ul>
+          <div class="highlight">
+            <p>两个四边形都满足 $AB=CD=6$，$\\angle A=\\angle C=60°$</p>
+            <p>但平行四边形<strong>还满足</strong>：$AD//BC$ 且 $AD=BC$</p>
+            <p>反例中 $AD=2\\neq 4=BC$，$AD$ 不平行于 $BC$</p>
+          </div>
+          <div class="key-point">
+            <p>💡 <strong>关键差异</strong>：反例中 $C$ 点"偏上"了，虽然保持了 $CD=6$ 和 $\\angle C=60°$，但 $C$ 不在使 $ABCD$ 成为平行四边形的位置。</p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+
+          // Draw parallelogram (green, dashed)
+          let keys = ['A','B','C','D'];
+          ctx.beginPath();
+          let p0g = toCanvas(paraPoints[keys[0]]);
+          ctx.moveTo(p0g[0], p0g[1]);
+          for (let i=1;i<4;i++){let p=toCanvas(paraPoints[keys[i]]);ctx.lineTo(p[0],p[1]);}
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(74,222,128,0.06)';
+          ctx.fill();
+          ctx.strokeStyle = '#4ade80';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([8,4]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Draw counterexample (blue, solid)
+          drawQuad(mathPoints, 'rgba(56,189,248,0.08)', '#38bdf8');
+
+          let pA = toCanvas(mathPoints.A);
+          let pB = toCanvas(mathPoints.B);
+          let pC = toCanvas(mathPoints.C);
+          let pD = toCanvas(mathPoints.D);
+          let pCp = toCanvas(paraPoints.C);
+
+          drawPoint(pA, 'A', '#f1f5f9', -18, 18);
+          drawPoint(pB, 'B', '#f1f5f9', 10, 18);
+          drawPoint(pC, 'C', '#38bdf8', 10, -8);
+          drawPoint(pD, 'D', '#f1f5f9', -18, -8);
+          drawPoint(pCp, "C'", '#4ade80', 12, 8);
+
+          // Arrow from C' to C showing how C "moved"
+          ctx.beginPath();
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4,3]);
+          ctx.moveTo(pCp[0], pCp[1]);
+          ctx.lineTo(pC[0], pC[1]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Arrow head
+          let dx = pC[0]-pCp[0], dy = pC[1]-pCp[1];
+          let len = Math.sqrt(dx*dx+dy*dy);
+          let ux = dx/len, uy = dy/len;
+          ctx.beginPath();
+          ctx.fillStyle = '#fbbf24';
+          ctx.moveTo(pC[0], pC[1]);
+          ctx.lineTo(pC[0]-8*ux+4*uy, pC[1]-8*uy-4*ux);
+          ctx.lineTo(pC[0]-8*ux-4*uy, pC[1]-8*uy+4*ux);
+          ctx.fill();
+
+          // Labels
+          ctx.font = 'bold 14px -apple-system, sans-serif';
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillText('反例 ABCD（不是平行四边形）', 20, 25);
+          ctx.fillStyle = '#4ade80';
+          ctx.fillText("平行四边形 ABC'D（对比）", 20, 48);
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = '13px -apple-system, sans-serif';
+          ctx.fillText("C'偏移到C", (pCp[0]+pC[0])/2+12, (pCp[1]+pC[1])/2);
+        }
+      },
+      {
+        title: '⑥ 直觉理解',
+        content: `
+          <h2>步骤 6：为什么条件不够？</h2>
+          <p>直觉理解：</p>
+          <div class="highlight">
+            <p><strong>想象一下</strong>：固定 $A$、$B$ 两点和 $\\angle A = 60°$，</p>
+            <p>$D$ 在从 $A$ 出发、与 $AB$ 成 $60°$ 的射线上自由移动。</p>
+            <p>对于每个 $D$，$C$ 在以 $D$ 为圆心、半径 $AB$ 的圆上找到使 $\\angle C = 60°$ 的位置。</p>
+            <p>这样的 $C$ <strong>不止一个</strong>！只有恰好其中一个构成平行四边形。</p>
+          </div>
+          <p>用方程来看：</p>
+          <p>设 $C$ 在 $CD=6$ 的圆上参数化为 $\\theta$，条件 $\\angle BCD=60°$ 给出方程：</p>
+          <p>$$5\\cos\\theta - \\sqrt{3}\\sin\\theta = 4 \\quad \\text{或} \\quad 5\\cos\\theta - \\sqrt{3}\\sin\\theta = 5$$</p>
+          <p>第一个方程对应<strong>反例</strong>，第二个对应<strong>平行四边形</strong>。</p>
+          <div class="key-point">
+            <p>💡 所以满足条件的四边形有<strong>两种</strong>：一种是平行四边形，另一种不是。</p>
+            <p>仅凭"一组对边相等 + 一组对角相等"<strong>无法唯一确定</strong>为平行四边形。</p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+          // Show the circle of possible C positions
+          let scale = 55;
+          let ox = 80, oy = 380;
+
+          let pA = toCanvas(mathPoints.A, ox, oy, scale);
+          let pB = toCanvas(mathPoints.B, ox, oy, scale);
+          let pD = toCanvas(mathPoints.D, ox, oy, scale);
+
+          // Draw the ray from A at 60°
+          let rayEnd = [mathPoints.A[0]+8*Math.cos(Math.PI/3), mathPoints.A[1]+8*Math.sin(Math.PI/3)];
+          drawSegment(pA, toCanvas(rayEnd, ox, oy, scale), 'rgba(251,146,60,0.4)', 1.5, [5,3]);
+
+          // Draw circle around D with radius 6
+          let cD = toCanvas(mathPoints.D, ox, oy, scale);
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(167,139,250,0.4)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([5,3]);
+          ctx.arc(cD[0], cD[1], 6*scale, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.font = '12px -apple-system, sans-serif';
+          ctx.fillStyle = '#a78bfa';
+          ctx.fillText('CD=6 的圆', cD[0]-6*scale-10, cD[1]+20);
+
+          // Draw the two solutions
+          let pC1 = toCanvas(mathPoints.C, ox, oy, scale); // counterexample
+          let pC2 = toCanvas(paraPoints.C, ox, oy, scale); // parallelogram
+
+          // Draw both quads
+          // Parallelogram in green dashed
+          ctx.beginPath();
+          ctx.moveTo(pA[0],pA[1]); ctx.lineTo(pB[0],pB[1]); ctx.lineTo(pC2[0],pC2[1]); ctx.lineTo(pD[0],pD[1]);
+          ctx.closePath();
+          ctx.strokeStyle = '#4ade80';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([6,4]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Counterexample in blue solid
+          ctx.beginPath();
+          ctx.moveTo(pA[0],pA[1]); ctx.lineTo(pB[0],pB[1]); ctx.lineTo(pC1[0],pC1[1]); ctx.lineTo(pD[0],pD[1]);
+          ctx.closePath();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          drawPoint(pA, 'A', '#f1f5f9', -18, 18);
+          drawPoint(pB, 'B', '#f1f5f9', 10, 18);
+          drawPoint(pD, 'D', '#f1f5f9', -18, -8);
+
+          // Mark the two C positions
+          ctx.beginPath();
+          ctx.fillStyle = '#38bdf8';
+          ctx.arc(pC1[0], pC1[1], 6, 0, Math.PI*2);
+          ctx.fill();
+          ctx.font = 'bold 14px -apple-system, sans-serif';
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillText('C₁ (反例)', pC1[0]+10, pC1[1]-10);
+
+          ctx.beginPath();
+          ctx.fillStyle = '#4ade80';
+          ctx.arc(pC2[0], pC2[1], 6, 0, Math.PI*2);
+          ctx.fill();
+          ctx.font = 'bold 14px -apple-system, sans-serif';
+          ctx.fillStyle = '#4ade80';
+          ctx.fillText('C₂ (平行四边形)', pC2[0]+10, pC2[1]+18);
+
+          // Title
+          ctx.font = 'bold 14px -apple-system, sans-serif';
+          ctx.fillStyle = '#f1f5f9';
+          ctx.fillText('满足条件的 C 有两个位置！', W/2 - 100, 25);
+        }
+      },
+      {
+        title: '⑦ 最终结论',
+        content: `
+          <h2>步骤 7：最终结论</h2>
+          <div class="conclusion">
+            <p style="font-size:1.1em"><strong>答：不一定是平行四边形。</strong></p>
+          </div>
+          <p><strong>反例：</strong></p>
+          <p>四边形 $ABCD$ 中，$A=(0,0)$，$B=(6,0)$，$C=\\left(\\dfrac{46}{7},\\,\\dfrac{16\\sqrt{3}}{7}\\right)$，$D=(1,\\sqrt{3})$</p>
+          <p>满足 $AB=CD=6$，$\\angle A=\\angle C=60°$，但 $DA=2\\neq 4=BC$，不是平行四边形。</p>
+
+          <div class="key-point">
+            <p>📝 <strong>考试答题模板：</strong></p>
+            <p>不一定是平行四边形。反例如下：</p>
+            <p>取四边形 $ABCD$，使 $AB=CD=6$，$\\angle A=\\angle C=60°$，$DA=2$，$BC=4$。</p>
+            <p>此四边形满足"一组对边相等，一组对角相等"，但另一组对边 $DA\\neq BC$，所以不是平行四边形。</p>
+          </div>
+
+          <div class="warning">
+            <p>⚡ <strong>易错点提醒：</strong></p>
+            <p>很多同学会误以为"一组对边相等 + 一组对角相等"就够了。记住：</p>
+            <ul>
+              <li>要<strong>两组</strong>对边分别相等，或</li>
+              <li>要<strong>两组</strong>对角分别相等，或</li>
+              <li>要<strong>同一组</strong>对边平行且相等</li>
+            </ul>
+            <p>混搭"一组对边 + 一组对角"是<strong>不够的</strong>！</p>
+          </div>
+        `,
+        draw: function() {
+          clearCanvas();
+          // Final beautiful diagram
+          drawQuad(mathPoints, 'rgba(56,189,248,0.1)', '#38bdf8');
+
+          let pA = toCanvas(mathPoints.A);
+          let pB = toCanvas(mathPoints.B);
+          let pC = toCanvas(mathPoints.C);
+          let pD = toCanvas(mathPoints.D);
+
+          drawPoint(pA, 'A', '#f1f5f9', -18, 18);
+          drawPoint(pB, 'B', '#f1f5f9', 10, 18);
+          drawPoint(pC, 'C', '#f1f5f9', 10, -8);
+          drawPoint(pD, 'D', '#f1f5f9', -18, -8);
+
+          drawEqualMark(pA, pB, 1, '#4ade80');
+          drawEqualMark(pC, pD, 1, '#4ade80');
+          drawMidLabel(pA, pB, '6', '#4ade80', 20);
+          drawMidLabel(pC, pD, '6', '#4ade80', -24);
+
+          // Unequal sides in red
+          drawSegment(pA, pD, '#f87171', 2.5);
+          drawSegment(pB, pC, '#f87171', 2.5);
+          drawMidLabel(pA, pD, '2', '#f87171', -20);
+          drawMidLabel(pB, pC, '4', '#f87171', 20);
+
+          drawAngleArc(pA, pB, pD, 32, '#fb923c', '60°');
+          drawAngleArc(pC, pD, pB, 32, '#fb923c', '60°');
+
+          // Big conclusion
+          ctx.font = 'bold 22px -apple-system, sans-serif';
+          ctx.fillStyle = '#f87171';
+          ctx.fillText('✗ 不是平行四边形', W/2 - 110, 40);
+
+          ctx.font = '15px -apple-system, sans-serif';
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillText('AB=CD=6, ∠A=∠C=60°', W/2 - 90, 68);
+          ctx.fillText('但 DA=2 ≠ BC=4', W/2 - 60, 90);
+
+          // Cross through "parallelogram"
+          ctx.save();
+          ctx.translate(W/2, H - 50);
+          ctx.font = 'bold 18px -apple-system, sans-serif';
+          ctx.fillStyle = 'rgba(248,113,113,0.3)';
+          ctx.fillText('平行四边形', -50, 0);
+          ctx.strokeStyle = '#f87171';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(-55, -8);
+          ctx.lineTo(60, 4);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    ];
+
+    // ============ Navigation ============
+    let currentStep = 0;
+
+    function buildStepNav() {
+      let nav = document.getElementById('stepNav');
+      nav.innerHTML = '';
+      steps.forEach((s, i) => {
+        let btn = document.createElement('button');
+        btn.className = 'step-btn' + (i === currentStep ? ' active' : '');
+        btn.textContent = s.title;
+        btn.onclick = () => goToStep(i);
+        nav.appendChild(btn);
+      });
+    }
+
+    function goToStep(index) {
+      if (index < 0 || index >= steps.length) return;
+      currentStep = index;
+      buildStepNav();
+      updateUI();
+    }
+
+    function updateUI() {
+      let step = steps[currentStep];
+      document.getElementById('proofPanel').innerHTML = step.content;
+      document.getElementById('navInfo').textContent = `步骤 ${currentStep+1} / ${steps.length}`;
+      document.getElementById('prevBtn').disabled = currentStep === 0;
+      document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+
+      step.draw();
+
+      renderMathInElement(document.getElementById('proofPanel'), {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+
+      // Scroll nav to active button
+      let activeBtn = document.querySelector('.step-btn.active');
+      if (activeBtn) activeBtn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goToStep(currentStep+1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goToStep(currentStep-1); }
+    });
+
+    // Init
+    buildStepNav();
+    updateUI();
+  </script>
+</body>
+</html>
