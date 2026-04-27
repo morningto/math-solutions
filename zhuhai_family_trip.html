@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>珠海五一家庭游 · 一家六口 5.1–5.3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+  .day1-color { color: #0284c7; }
+  .day1-bg { background: #0284c7; }
+  .day1-border { border-color: #0284c7; }
+  .day1-bg-soft { background: #e0f2fe; }
+  .day2-color { color: #059669; }
+  .day2-bg { background: #059669; }
+  .day2-border { border-color: #059669; }
+  .day2-bg-soft { background: #d1fae5; }
+  .day3-color { color: #d97706; }
+  .day3-bg { background: #d97706; }
+  .day3-border { border-color: #d97706; }
+  .day3-bg-soft { background: #fef3c7; }
+  .timeline-dot { position: absolute; left: -7px; top: 8px; width: 14px; height: 14px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px currentColor; }
+  .leaflet-popup-content { font-size: 13px; line-height: 1.5; }
+  .leaflet-popup-content b { font-weight: 600; }
+  .check-item { transition: all 0.2s; }
+  .check-item.checked { opacity: 0.45; text-decoration: line-through; }
+  .scrollbar-thin::-webkit-scrollbar { height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  @media print {
+    .no-print { display: none !important; }
+    section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- Hero -->
+<header class="bg-gradient-to-br from-sky-600 via-cyan-600 to-teal-600 text-white">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="text-sm uppercase tracking-widest opacity-80 mb-2">2026 LABOR DAY · ZHUHAI</div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-3">珠海五一家庭游</h1>
+    <p class="text-lg md:text-xl opacity-90 mb-6">一家六口 · 爸妈 + 儿女 + 公公婆婆 · 5月1日–3日</p>
+    <div class="flex flex-wrap gap-3">
+      <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm">5.1 11:30 高铁到珠海站</span>
+      <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm">5.3 16:00 高铁离开</span>
+      <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm">自驾 · 住机场附近</span>
+      <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm">含 70岁老人 + 儿童</span>
+    </div>
+  </div>
+</header>
+
+<!-- Sticky nav -->
+<nav class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 no-print">
+  <div class="max-w-6xl mx-auto px-6 overflow-x-auto scrollbar-thin">
+    <ul class="flex gap-2 py-3 text-sm whitespace-nowrap">
+      <li><a href="#overview" class="px-3 py-1.5 rounded-full hover:bg-slate-100">概览</a></li>
+      <li><a href="#map" class="px-3 py-1.5 rounded-full hover:bg-slate-100">行程地图</a></li>
+      <li><a href="#day1" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Day 1 沿海南行</a></li>
+      <li><a href="#day2" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Day 2 淇澳环岛</a></li>
+      <li><a href="#day3" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Day 3 沿海北行</a></li>
+      <li><a href="#food" class="px-3 py-1.5 rounded-full hover:bg-slate-100">美食 / 餐厅</a></li>
+      <li><a href="#packing" class="px-3 py-1.5 rounded-full hover:bg-slate-100">行李装备</a></li>
+      <li><a href="#todos" class="px-3 py-1.5 rounded-full hover:bg-slate-100">必做清单</a></li>
+      <li><a href="#emergency" class="px-3 py-1.5 rounded-full hover:bg-slate-100">应急</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Overview -->
+<section id="overview" class="max-w-6xl mx-auto px-6 py-12">
+  <h2 class="text-2xl font-bold mb-6 text-slate-900">出行概览</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase mb-2">关键决策</div>
+      <ul class="space-y-2 text-sm">
+        <li class="flex gap-2"><span class="day1-color font-bold">·</span> 5.1 + 5.3 拼成"沿海 C 字形"环海游</li>
+        <li class="flex gap-2"><span class="day2-color font-bold">·</span> 5.2 全天淇澳岛"真环岛 + 赶海"双玩</li>
+        <li class="flex gap-2"><span class="day3-color font-bold">·</span> 雷雨当风险项，备 Plan B 不停摆</li>
+      </ul>
+    </div>
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase mb-2">天气与潮汐</div>
+      <ul class="space-y-2 text-sm">
+        <li><b>5.1</b> 多云转小雨 · 唯一干燥日 · 二井湾赶海最佳</li>
+        <li><b>5.2</b> 雷雨概率 70-85% · 淇澳潮位 0.3m 最低</li>
+        <li><b>5.3</b> 雷雨概率 80% · 圆明新园室内剧场可避雨</li>
+      </ul>
+    </div>
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase mb-2">三天三层"环"</div>
+      <ul class="space-y-2 text-sm">
+        <li><b>沿海半圈 (5.1)</b> 珠海站 → 横琴 → 机场</li>
+        <li><b>淇澳真环岛 (5.2)</b> 岛上环线 ~20 km</li>
+        <li><b>沿海半圈 (5.3)</b> 机场 → 圆明 → 情侣路 → 珠海站</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5">
+    <h3 class="font-semibold text-amber-900 mb-2">天气策略</h3>
+    <p class="text-sm text-amber-900">雷阵雨在珠海 5 月通常是局部短时（30-60 分钟过境），不是全天暴雨。<b>预报概率不等于必发生</b>，因此每天行程正常排，遇到雷雨按 Plan B 临时撤。海边/滩涂听到雷声立即撤离，30 分钟内不返回。</p>
+  </div>
+</section>
+
+<!-- Map -->
+<section id="map" class="max-w-6xl mx-auto px-6 py-12">
+  <h2 class="text-2xl font-bold mb-2 text-slate-900">行程地图</h2>
+  <p class="text-sm text-slate-600 mb-6">点击景点查看说明，按钮切换某天路线</p>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="flex flex-wrap gap-2 p-4 border-b border-slate-200 no-print">
+      <button onclick="toggleDay('all')" class="day-btn px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium" data-day="all">全部三天</button>
+      <button onclick="toggleDay(1)" class="day-btn px-4 py-2 rounded-lg bg-slate-100 text-sm" data-day="1">Day 1 · 沿海南行</button>
+      <button onclick="toggleDay(2)" class="day-btn px-4 py-2 rounded-lg bg-slate-100 text-sm" data-day="2">Day 2 · 淇澳环岛</button>
+      <button onclick="toggleDay(3)" class="day-btn px-4 py-2 rounded-lg bg-slate-100 text-sm" data-day="3">Day 3 · 沿海北行</button>
+    </div>
+    <div id="leaflet-map" style="height: 580px; width: 100%;"></div>
+    <div class="flex flex-wrap gap-4 p-4 bg-slate-50 text-xs">
+      <div class="flex items-center gap-2"><span class="w-4 h-1 bg-sky-600"></span>Day 1 路线</div>
+      <div class="flex items-center gap-2"><span class="w-4 h-1 bg-emerald-600"></span>Day 2 路线</div>
+      <div class="flex items-center gap-2"><span class="w-4 h-1 bg-amber-600"></span>Day 3 路线</div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-rose-500"></span>住宿</div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-sky-600"></span>景点</div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span>餐厅</div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-700"></span>交通</div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-400"></span>Plan B</div>
+    </div>
+  </div>
+</section>
+
+<!-- Day 1 -->
+<section id="day1" class="max-w-6xl mx-auto px-6 py-12">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="day1-bg text-white text-sm font-bold px-3 py-1 rounded-full">Day 1</span>
+    <h2 class="text-2xl font-bold text-slate-900">5 月 1 日（周五）· 沿海南行 + 二井湾赶海</h2>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4 text-slate-700">主行程</h3>
+      <ol class="relative border-l-2 day1-border ml-2 space-y-5">
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm day1-color font-semibold">11:30</div>
+          <div class="font-medium">珠海站到达，自驾出站</div>
+          <div class="text-xs text-slate-500">省去取车 1 小时</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm day1-color font-semibold">12:00–12:30</div>
+          <div class="font-medium">港珠澳大桥珠海公路口岸观景台</div>
+          <div class="text-xs text-slate-500">距珠海站 5 km · 平地 200m · 老人轻松</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm day1-color font-semibold">12:30–13:30</div>
+          <div class="font-medium">拱北午饭 · 金悦轩海鲜酒家（拱北店）</div>
+          <div class="text-xs text-slate-500">人均 ¥150-200 · 麻皮乳猪、虾饺皇、流沙包</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm day1-color font-semibold">13:30–14:30</div>
+          <div class="font-medium">横琴大桥南下，路过日月贝/横琴金融岛</div>
+          <div class="text-xs text-slate-500">车上观景，不停车</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm font-bold bg-sky-100 day1-color inline-block px-2 py-0.5 rounded">14:30–17:00 · 黄金赶海窗口</div>
+          <div class="font-medium mt-1">横琴二井湾湿地公园赶海</div>
+          <div class="text-xs text-slate-500">潮位 0.7m · 5.1 唯一无雷雨日 · 螃蟹/贝类丰富</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm day1-color font-semibold">17:30–19:00</div>
+          <div class="font-medium">横琴晚饭 · 红苹果海鲜（长隆天河店）</div>
+          <div class="text-xs text-slate-500">人均 ¥120-180 · 豉油鸡、盐焗虾、荷叶蒸肉饼</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day1-color"></span>
+          <div class="font-mono text-sm day1-color font-semibold">19:00–20:00</div>
+          <div class="font-medium">西部沿海高速南下，回机场附近酒店</div>
+          <div class="text-xs text-slate-500">约 35 km · 夜间路况好 · 沿岸海景</div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+        <div class="text-xs uppercase tracking-wider text-amber-700 mb-2">风险与 Plan B</div>
+        <div class="space-y-3 text-sm">
+          <div>
+            <b class="text-amber-900">二井湾名额抢不到</b>
+            <p class="text-amber-800 mt-1">改情侣路精华段：海滨公园 → 香炉湾沙滩 → 日月贝 → 17:30 海怡酒家晚饭</p>
+          </div>
+          <div>
+            <b class="text-amber-900">突降大雨/雷暴</b>
+            <p class="text-amber-800 mt-1">撤回拱北华发商都室内逛街+用餐，傍晚再走横琴大桥回酒店</p>
+          </div>
+          <div>
+            <b class="text-amber-900">高铁延误 2h+</b>
+            <p class="text-amber-800 mt-1">直接放弃二井湾，午饭后走情侣路逛到 18:00，回酒店</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="day1-bg-soft rounded-xl p-5">
+        <div class="text-xs uppercase tracking-wider day1-color mb-2">本日数据</div>
+        <ul class="space-y-1 text-sm text-slate-700">
+          <li>路线方向：北 → 中 → 南</li>
+          <li>纯驾驶：约 2.5 小时 / 100 km</li>
+          <li>最长徒步：滩涂 1 km</li>
+          <li>必预约：二井湾湿地公园</li>
+          <li>必订位：金悦轩、红苹果</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Day 2 -->
+<section id="day2" class="max-w-6xl mx-auto px-6 py-12 bg-emerald-50/30">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="day2-bg text-white text-sm font-bold px-3 py-1 rounded-full">Day 2</span>
+    <h2 class="text-2xl font-bold text-slate-900">5 月 2 日（周六）· 淇澳岛环岛 + 红树林 + 赶海</h2>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4 text-slate-700">主行程</h3>
+      <ol class="relative border-l-2 day2-border ml-2 space-y-5">
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">07:00</div>
+          <div class="font-medium">酒店出门（早出避堵+抓上午无雨窗口）</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">08:30</div>
+          <div class="font-medium">过淇澳大桥进岛</div>
+          <div class="text-xs text-slate-500">单程约 75 km / 1h20min</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">08:30–10:00</div>
+          <div class="font-medium">淇澳红树林湿地公园栈道</div>
+          <div class="text-xs text-slate-500">平地老人友好 · 看招潮蟹/弹涂鱼 · 须预约</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">10:00–11:30</div>
+          <div class="font-medium">岛上环岛驾驶 · 真"环岛自驾" 20 km</div>
+          <div class="text-xs text-slate-500">白石街渔港 → 苏兆征故居 → 东澳村</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">11:30–13:00</div>
+          <div class="font-medium">岛上午饭 · 家园农庄</div>
+          <div class="text-xs text-slate-500">焖鹅、泥煨鸡、煲仔饭，孩子能在院子里跑</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">13:00–14:30</div>
+          <div class="font-medium">南芒湾入场，老人坐凳子等落潮，孩子玩沙</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm font-bold bg-emerald-100 day2-color inline-block px-2 py-0.5 rounded">14:30–17:30 · 黄金赶海窗口</div>
+          <div class="font-medium mt-1">南芒湾赶海（潮位 0.3m，三天最低）</div>
+          <div class="text-xs text-slate-500">礁石生蚝 · 招潮蟹 · 海螺 · 戴手套防生蚝壳割手</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">18:00</div>
+          <div class="font-medium">离岛过淇澳大桥</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">18:30–19:30</div>
+          <div class="font-medium">唐家湾叠石酒家（总店）晚饭</div>
+          <div class="text-xs text-slate-500">人均 ¥126 · 椒盐濑尿虾、滴津烧鹅、太和豆腐</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day2-color"></span>
+          <div class="font-mono text-sm day2-color font-semibold">20:30</div>
+          <div class="font-medium">回机场附近酒店</div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+        <div class="text-xs uppercase tracking-wider text-amber-700 mb-2">风险与 Plan B</div>
+        <div class="space-y-3 text-sm">
+          <div>
+            <b class="text-amber-900">监测信号</b>
+            <p class="text-amber-800 mt-1">和风天气 App 雷达图 + 听到雷声立即撤离滩涂</p>
+          </div>
+          <div>
+            <b class="text-amber-900">上午就下大雨</b>
+            <p class="text-amber-800 mt-1">跳过红树林栈道（湿滑）→ 改家园农庄早茶 + 室内</p>
+          </div>
+          <div>
+            <b class="text-amber-900">赶海期间起雷雨</b>
+            <p class="text-amber-800 mt-1">30 分钟内撤回家园农庄/停车场避雨；雷阵雨过境后回去继续</p>
+          </div>
+          <div>
+            <b class="text-amber-900">下午雷雨连绵</b>
+            <p class="text-amber-800 mt-1">18:00 前撤离，回酒店区域改去<b>海泉湾温泉</b>（金湾平沙）泡到 21:00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="day2-bg-soft rounded-xl p-5">
+        <div class="text-xs uppercase tracking-wider day2-color mb-2">本日数据</div>
+        <ul class="space-y-1 text-sm text-slate-700">
+          <li>路线方向：南 → 北 → 南</li>
+          <li>纯驾驶：约 4 小时 / 170 km</li>
+          <li>必预约：淇澳红树林（小程序"广东自然保护地公共服务"）</li>
+          <li>必订位：叠石酒家、家园农庄</li>
+          <li>潮汐：14:30 起落潮，17:30 潮位 0.3m</li>
+          <li>农历：三月十六，大潮日</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Day 3 -->
+<section id="day3" class="max-w-6xl mx-auto px-6 py-12">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="day3-bg text-white text-sm font-bold px-3 py-1 rounded-full">Day 3</span>
+    <h2 class="text-2xl font-bold text-slate-900">5 月 3 日（周日）· 沿海北行 + 圆明新园 + 情侣路收尾</h2>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4 text-slate-700">主行程</h3>
+      <ol class="relative border-l-2 day3-border ml-2 space-y-5">
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm day3-color font-semibold">09:00</div>
+          <div class="font-medium">退房，行李上车</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm day3-color font-semibold">09:30</div>
+          <div class="font-medium">西部沿海高速北上（45 km）</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm font-bold bg-amber-100 day3-color inline-block px-2 py-0.5 rounded">10:00–12:00</div>
+          <div class="font-medium mt-1">圆明新园（含中心剧场室内雷雨避险）</div>
+          <div class="text-xs text-slate-500">免费入园 · 五一可能需预约 · 必坐《乾隆号》游船 ¥39 · 11:00《皇帝早朝》迎宾</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm font-bold bg-amber-100 day3-color inline-block px-2 py-0.5 rounded">12:30</div>
+          <div class="font-medium">送行家宴 · 仁恒洲际·彩丰楼</div>
+          <div class="text-xs text-slate-500">人均 ¥230 · 海景包房 · 13:00 入座 14:00 离桌</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm day3-color font-semibold">14:00–14:20</div>
+          <div class="font-medium">情侣路精华段车上巡游</div>
+          <div class="text-xs text-slate-500">海滨公园 → 香炉湾沙滩 → 日月贝（不下车，时间不够）</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm day3-color font-semibold">14:30</div>
+          <div class="font-medium">进珠海站，提前 1.5 小时</div>
+        </li>
+        <li class="pl-6 relative">
+          <span class="timeline-dot day3-color"></span>
+          <div class="font-mono text-sm day3-color font-semibold">16:00</div>
+          <div class="font-medium">高铁出发</div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+        <div class="text-xs uppercase tracking-wider text-amber-700 mb-2">风险与 Plan B</div>
+        <div class="space-y-3 text-sm">
+          <div>
+            <b class="text-amber-900">圆明新园暴雨</b>
+            <p class="text-amber-800 mt-1">只看中心剧场室内表演 + 长廊；坐游船改成下次再说</p>
+          </div>
+          <div>
+            <b class="text-amber-900">情侣路雷暴</b>
+            <p class="text-amber-800 mt-1">12:00 直接出园 → 彩丰楼海景包房观雨；省去情侣路下车</p>
+          </div>
+          <div>
+            <b class="text-amber-900">情侣路严重堵车</b>
+            <p class="text-amber-800 mt-1">14:00 离桌后改走九洲大道直奔珠海站，省 15 分钟</p>
+          </div>
+          <div>
+            <b class="text-amber-900">高铁提前到</b>
+            <p class="text-amber-800 mt-1">候车厅有麦当劳/星巴克，老人歇脚正好</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="day3-bg-soft rounded-xl p-5">
+        <div class="text-xs uppercase tracking-wider day3-color mb-2">本日数据</div>
+        <ul class="space-y-1 text-sm text-slate-700">
+          <li>路线方向：南 → 北</li>
+          <li>纯驾驶：约 1.5 小时 / 60 km</li>
+          <li>关键时间：14:30 必须进站</li>
+          <li>必预约：圆明新园（4-30 早查放号）</li>
+          <li>必订位：彩丰楼（电话 0756-8889999）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Food -->
+<section id="food" class="max-w-6xl mx-auto px-6 py-12">
+  <h2 class="text-2xl font-bold mb-6 text-slate-900">珠海美食 · 必吃与订位</h2>
+
+  <h3 class="text-lg font-semibold mb-3 text-slate-700">必吃 8 道</h3>
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">粤式早茶</div>
+      <div class="text-xs text-slate-500 mt-1">虾饺 / 烧卖 / 流沙包 / 凤爪 / 肠粉</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">白蕉海鲈（清蒸）</div>
+      <div class="text-xs text-slate-500 mt-1">老人小孩首选 · 刺少肉嫩</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">横琴生蚝</div>
+      <div class="text-xs text-slate-500 mt-1">蒜蓉/姜葱蒸 · 避炭烧（油重）</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">烧腊三宝</div>
+      <div class="text-xs text-slate-500 mt-1">叉烧 / 油鸡 / 烧鸭</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">煲仔饭</div>
+      <div class="text-xs text-slate-500 mt-1">腊味 / 窝蛋牛肉</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">澳门猪扒包/葡式蛋挞</div>
+      <div class="text-xs text-slate-500 mt-1">大利来记 · 孩子最爱</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">顺德双皮奶/糖水</div>
+      <div class="text-xs text-slate-500 mt-1">合德记（粤华路）</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg border border-slate-200">
+      <div class="font-medium">横山鸭脚扎</div>
+      <div class="text-xs text-slate-500 mt-1">斗门非遗</div>
+    </div>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3 text-slate-700">6 顿正餐订位</h3>
+  <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-slate-200">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100">
+        <tr>
+          <th class="text-left p-3 font-semibold">时段</th>
+          <th class="text-left p-3 font-semibold">餐厅</th>
+          <th class="text-left p-3 font-semibold">人均</th>
+          <th class="text-left p-3 font-semibold">必点</th>
+          <th class="text-left p-3 font-semibold">订位</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200">
+        <tr>
+          <td class="p-3 align-top"><span class="day1-bg-soft day1-color text-xs font-medium px-2 py-0.5 rounded">5.1 午</span><br><span class="text-xs text-slate-500">拱北</span></td>
+          <td class="p-3 align-top"><b>金悦轩海鲜酒家（拱北店）</b><br><span class="text-xs text-slate-500">情侣南路 265 号 B 区</span></td>
+          <td class="p-3 align-top">¥150-200</td>
+          <td class="p-3 align-top">麻皮乳猪、虾饺皇、流沙包、白灼基围虾</td>
+          <td class="p-3 align-top">微信小程序"金悦轩"或大众点评</td>
+        </tr>
+        <tr>
+          <td class="p-3 align-top"><span class="day1-bg-soft day1-color text-xs font-medium px-2 py-0.5 rounded">5.1 晚</span><br><span class="text-xs text-slate-500">横琴</span></td>
+          <td class="p-3 align-top"><b>红苹果海鲜（长隆天河店）</b><br><span class="text-xs text-slate-500">横琴天河街 19 号</span></td>
+          <td class="p-3 align-top">¥120-180</td>
+          <td class="p-3 align-top">豉油鸡、盐焗虾、荷叶蒸肉饼</td>
+          <td class="p-3 align-top">大众点评在线订座</td>
+        </tr>
+        <tr>
+          <td class="p-3 align-top"><span class="day2-bg-soft day2-color text-xs font-medium px-2 py-0.5 rounded">5.2 早茶</span><br><span class="text-xs text-slate-500">机场附近</span></td>
+          <td class="p-3 align-top">毛林金湾大酒店中餐厅 / 酒店早餐<br><span class="text-xs text-slate-500">早出 7:00 时可省略</span></td>
+          <td class="p-3 align-top">¥120</td>
+          <td class="p-3 align-top">海景包房 9:30-14:30 早茶</td>
+          <td class="p-3 align-top">酒店前台 / 电话</td>
+        </tr>
+        <tr>
+          <td class="p-3 align-top"><span class="day2-bg-soft day2-color text-xs font-medium px-2 py-0.5 rounded">5.2 午</span><br><span class="text-xs text-slate-500">淇澳岛</span></td>
+          <td class="p-3 align-top"><b>家园农庄（淇澳岛上）</b><br><span class="text-xs text-slate-500">红树林后花园</span></td>
+          <td class="p-3 align-top">¥80-100</td>
+          <td class="p-3 align-top">焖鹅、泥煨鸡、柴火腊味煲仔饭</td>
+          <td class="p-3 align-top">大众点评搜店名</td>
+        </tr>
+        <tr>
+          <td class="p-3 align-top"><span class="day2-bg-soft day2-color text-xs font-medium px-2 py-0.5 rounded">5.2 晚</span><br><span class="text-xs text-slate-500">唐家湾</span></td>
+          <td class="p-3 align-top"><b>叠石酒家（唐家总店）</b><br><span class="text-xs text-slate-500">港湾大道与情侣北路</span></td>
+          <td class="p-3 align-top">¥126</td>
+          <td class="p-3 align-top">椒盐濑尿虾、滴津烧鹅、叠石一品鸡、太和豆腐</td>
+          <td class="p-3 align-top">大众点评 / 电话</td>
+        </tr>
+        <tr>
+          <td class="p-3 align-top"><span class="day3-bg-soft day3-color text-xs font-medium px-2 py-0.5 rounded">5.3 午</span><br><span class="text-xs text-slate-500">情侣路</span></td>
+          <td class="p-3 align-top"><b>仁恒洲际·彩丰楼</b><br><span class="text-xs text-slate-500">情侣南路 1 号 4 楼</span></td>
+          <td class="p-3 align-top">¥230</td>
+          <td class="p-3 align-top">金沙脆皮乳鸽、鲍汁焖伊面、烧鹅、椰皇炖花胶</td>
+          <td class="p-3 align-top"><a href="tel:0756-8889999" class="text-sky-600 underline">0756-8889999</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 grid md:grid-cols-2 gap-4">
+    <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 text-sm">
+      <h4 class="font-semibold text-rose-900 mb-2">避坑提示</h4>
+      <ul class="space-y-1 text-rose-900">
+        <li>· 情侣路边推车"现开生蚝"——浸水增重</li>
+        <li>· 横琴长隆步行街外街海鲜城——茶位/开瓶/消毒三连宰客</li>
+        <li>· 标 1080 元一只的"野生海鲈"——白蕉养殖鲈鱼 80-150 元/斤已足够</li>
+        <li>· 70 岁老人避开：炭烧蚝、椒盐濑尿虾、肥肠煲、辣味馆</li>
+      </ul>
+    </div>
+    <div class="bg-sky-50 border border-sky-200 rounded-xl p-5 text-sm">
+      <h4 class="font-semibold text-sky-900 mb-2">订位小提示</h4>
+      <ul class="space-y-1 text-sky-900">
+        <li>· 茶位费 8-16 元/人 + 包房 10% 服务费是粤菜店惯例</li>
+        <li>· 订位时主动说"1 老 2 小要儿童椅 + 餐具"</li>
+        <li>· 6 人最好订包房，避开大堂吵闹（老人怕吵）</li>
+        <li>· 早茶店 9:00 前到不用排队，10:00 后高峰</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Packing -->
+<section id="packing" class="max-w-6xl mx-auto px-6 py-12 bg-slate-100/50">
+  <h2 class="text-2xl font-bold mb-2 text-slate-900">行李装备清单</h2>
+  <p class="text-sm text-slate-600 mb-6">勾选后状态保存在浏览器，关掉再打开仍在</p>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" id="packing-list">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <h3 class="font-semibold mb-3 text-slate-900">全员通用</h3>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>身份证 ×6（淇澳红树林必须）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>儿童户口本/出生证（实名预约用）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>高铁票/电子票截图</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>充电宝 ×2（含 PD 快充）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>充电线（Lightning + Type-C）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>纸巾 / 湿巾 / 消毒湿巾</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>大塑料袋 ×3（装湿衣/海鲜）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>密封袋（手机、证件防水）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>现金 500 元（农庄/小店应急）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>车载手机支架（自驾导航）</span></label>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <h3 class="font-semibold mb-3 text-slate-900">儿子 + 女儿</h3>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>速干 T 恤 + 短裤 ×3 套（雨天易湿）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>长袖薄外套 ×2（晚上/空调间）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>1 套全新备用衣（放车上）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>儿童雨衣 ×2（比共享伞实用）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>儿童防晒霜 SPF50+</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>儿童遮阳帽 / 太阳镜</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>泳衣 + 浮力背心</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>沙滩玩具（铲子、桶、网兜）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>水壶 ×2（防脱水）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>蒙脱石散/益生菌（外食肠胃）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>小零食/水果（车上、滩涂）</span></label>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <h3 class="font-semibold mb-3 text-slate-900">爸爸 + 妈妈</h3>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>速干衣裤 ×3 套</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>防晒衣 / 防晒霜 SPF50+</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>泳衣 + 浴巾</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>溯溪鞋 / 凉鞋</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>正式一套（5.3 彩丰楼海景餐）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>驾驶证（自驾必备）</span></label>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <h3 class="font-semibold mb-3 text-slate-900">赶海专项装备</h3>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>雨靴 ×3 双（二井湾必须，淤泥防陷）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>溯溪鞋 ×3 双（淇澳礁石）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>厚棉手套 ×6（撬生蚝防割）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>小铲子 + 网兜 ×4</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>塑料桶 ×2（装战利品）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>速干浴巾 ×4（海水 25°C 出来会冷）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>驱蚊液（二井湾必带）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>头灯/小手电（傍晚撤离）</span></label>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <h3 class="font-semibold mb-3 text-slate-900">雨具 + 药品包</h3>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>折叠伞 ×6</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>一次性轻薄雨衣 ×6（雷雨时撑伞危险）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>藿香正气液（中暑/闷热不适）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>创可贴 + 碘伏棉签（生蚝割伤必备）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>蒙脱石散（拉肚子）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>晕车药（自驾长途）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>风油精 / 清凉油（防蚊+提神）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>感冒药（空调温差大）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>体温计 / 退烧贴</span></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Todos -->
+<section id="todos" class="max-w-6xl mx-auto px-6 py-12">
+  <h2 class="text-2xl font-bold mb-6 text-slate-900">必做清单（按时间倒推）</h2>
+
+  <div class="grid lg:grid-cols-2 gap-5">
+    <div class="bg-rose-50 border-2 border-rose-300 rounded-xl p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded">最紧急</span>
+        <h3 class="font-semibold text-slate-900">今晚（4-27）</h3>
+      </div>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.2 淇澳红树林预约</b>：小程序"广东自然保护地公共服务" → 选 5.2，6 人拆 2 个身份证号</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.1 二井湾湿地公园预约</b>：公众号"横琴湿地" → 菜单"预约湿地" → "预约入园及活动"</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.3 中午彩丰楼</b>：直拨 <a href="tel:0756-8889999" class="text-sky-700 underline">0756-8889999</a>，订包房 6 人，说明 1 老 2 小要儿童椅</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.1 中午金悦轩拱北店</b>：微信小程序"金悦轩"或大众点评，订 12:00 圆桌 6 人</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.1 晚红苹果海鲜（长隆天河店）</b>：大众点评，订 18:30 包房或大圆桌</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.2 晚叠石酒家（唐家总店）</b>：大众点评，订 19:00 包房</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>5.2 午家园农庄</b>：大众点评搜"家园农庄 淇澳"，订 11:30 包房</span></label>
+      </div>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-300 rounded-xl p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">本周</span>
+        <h3 class="font-semibold text-slate-900">4-29 周三 ~ 4-30 周四</h3>
+      </div>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span><b>4-30 早 8:00</b>：圆明新园 5.3 上午预约（公众号"珠海圆明新园"看放号）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>下载和风天气 App，添加"珠海香洲"和"珠海金湾"两站</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>下载高德/百度地图离线包（珠海全市）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>家庭群发"统一身份证号 + 姓名"格式给所有预约人</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>查询 5.1 早晨珠海香洲站潮汐表精确时刻（大鱼潮汐 App）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>购买六人海泉湾温泉门票（备用 Plan B，到现场买也可）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>检查爱车：胎压、机油、玻璃水、随车工具</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>装备清单按本页打包齐</span></label>
+      </div>
+    </div>
+
+    <div class="bg-sky-50 border border-sky-300 rounded-xl p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-sky-600 text-white text-xs font-bold px-2 py-1 rounded">出发前</span>
+        <h3 class="font-semibold text-slate-900">4-30 周四晚 / 5-1 出发当天</h3>
+      </div>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>4-30 晚再上中央气象台核对预报，看是否有暴雨预警升级</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>给老人随身钱包放 200 元现金 + 身份证复印件</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>给小孩衣物上写"姓名+爸爸手机号"防走失贴纸</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>把酒店地址 + 自驾路线 + 紧急电话写在纸上给老人一份</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>5-1 早 6:00 起，再查一次珠海实时天气和路况</span></label>
+      </div>
+    </div>
+
+    <div class="bg-emerald-50 border border-emerald-300 rounded-xl p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded">每天早晨</span>
+        <h3 class="font-semibold text-slate-900">5.1 / 5.2 / 5.3 出门前</h3>
+      </div>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>看和风天气 App 雷达图（未来 2 小时降水）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>查 nmc.cn 看珠海当日预警</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>给老人量血压（习惯性）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>检查充电宝是否充满</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>带上当天预约二维码截图（截图放手机相册首位）</span></label>
+        <label class="flex items-start gap-2 check-item"><input type="checkbox" class="mt-1" /><span>水 + 零食上车</span></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Emergency -->
+<section id="emergency" class="max-w-6xl mx-auto px-6 py-12">
+  <h2 class="text-2xl font-bold mb-6 text-slate-900">应急联系方式</h2>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <div class="text-xs uppercase text-slate-500 mb-2">紧急</div>
+      <ul class="space-y-2 text-sm">
+        <li><b>急救</b> <a href="tel:120" class="float-right text-sky-600 underline">120</a></li>
+        <li><b>报警</b> <a href="tel:110" class="float-right text-sky-600 underline">110</a></li>
+        <li><b>火警</b> <a href="tel:119" class="float-right text-sky-600 underline">119</a></li>
+        <li><b>交通事故</b> <a href="tel:122" class="float-right text-sky-600 underline">122</a></li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <div class="text-xs uppercase text-slate-500 mb-2">珠海本地</div>
+      <ul class="space-y-2 text-sm">
+        <li><b>珠海文旅咨询</b> <a href="tel:12345" class="float-right text-sky-600 underline">12345</a></li>
+        <li><b>横琴湿地咨询</b> <a href="tel:0756-2990180" class="float-right text-sky-600 underline">0756-2990180</a></li>
+        <li><b>圆明新园</b> <a href="tel:0756-8610388" class="float-right text-sky-600 underline">0756-8610388</a></li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <div class="text-xs uppercase text-slate-500 mb-2">订位餐厅</div>
+      <ul class="space-y-2 text-sm">
+        <li><b>仁恒洲际·彩丰楼</b> <a href="tel:0756-8889999" class="float-right text-sky-600 underline">0756-8889999</a></li>
+        <li><b>金悦轩拱北店</b> <span class="float-right text-slate-400 text-xs">小程序订</span></li>
+        <li><b>红苹果海鲜</b> <span class="float-right text-slate-400 text-xs">大众点评订</span></li>
+        <li><b>叠石酒家</b> <span class="float-right text-slate-400 text-xs">大众点评订</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center py-8 text-xs text-slate-400 border-t border-slate-200">
+  本计划生成于 2026-04-27 · 数据来源：6 路 AI agent 联合调研 · 信息会变化，出行前再次核对官方公告
+</footer>
+
+<script>
+// 景点数据（GCJ-02 近似坐标，与高德瓦片一致）
+const POIS = [
+  { id: 'station', name: '珠海站', lat: 22.226, lng: 113.560, type: 'transit', day: [1, 3], desc: '5.1 11:30 到 / 5.3 16:00 离开<br>提前 90 min 进站' },
+  { id: 'hotel', name: '机场附近酒店', lat: 22.020, lng: 113.380, type: 'hotel', day: [1, 2, 3], desc: '5.1-5.2 两晚住宿<br>金湾区 / 距珠海机场约 5 km' },
+  { id: 'gantang', name: '港珠澳大桥珠海公路口岸观景台', lat: 22.220, lng: 113.541, type: 'attraction', day: [1], desc: '<b>5.1 12:00–12:30</b><br>免费 · 平地 200m' },
+  { id: 'gongbei', name: '拱北口岸 / 华发商都', lat: 22.215, lng: 113.561, type: 'attraction', day: [1], desc: '商场 / 大利来葡式蛋挞<br>5.1 雷雨 Plan B 室内' },
+  { id: 'jinyuexuan', name: '金悦轩海鲜酒家（拱北店）', lat: 22.215, lng: 113.563, type: 'food', day: [1], desc: '<b>5.1 午饭</b> ¥150-200<br>麻皮乳猪、虾饺皇' },
+  { id: 'erjingwan', name: '横琴二井湾湿地公园', lat: 22.080, lng: 113.510, type: 'attraction', day: [1], desc: '<b>5.1 14:30–17:00 赶海</b><br>潮位 0.7m · 螃蟹/贝类<br>需公众号"横琴湿地"预约' },
+  { id: 'redapple', name: '红苹果海鲜（长隆天河店）', lat: 22.140, lng: 113.572, type: 'food', day: [1], desc: '<b>5.1 晚饭</b> ¥120-180<br>豉油鸡、盐焗虾' },
+  { id: 'qiao_bridge', name: '淇澳大桥', lat: 22.376, lng: 113.594, type: 'transit', day: [2], desc: '进岛唯一通道' },
+  { id: 'qiao_red', name: '淇澳红树林湿地公园', lat: 22.405, lng: 113.624, type: 'attraction', day: [2], desc: '<b>5.2 8:30–10:00</b><br>栈道平地 · 须预约<br>看招潮蟹/弹涂鱼' },
+  { id: 'baishi', name: '白石街渔港', lat: 22.418, lng: 113.625, type: 'attraction', day: [2], desc: '<b>5.2 10:00–10:30</b><br>古渔港 · 拍照' },
+  { id: 'suzhaozheng', name: '苏兆征故居', lat: 22.420, lng: 113.617, type: 'attraction', day: [2], desc: '<b>5.2 10:30–11:00</b><br>免费参观' },
+  { id: 'dongao', name: '东澳村', lat: 22.395, lng: 113.629, type: 'attraction', day: [2], desc: '<b>5.2 11:00–11:30</b><br>古村漫步' },
+  { id: 'jiayuan', name: '家园农庄', lat: 22.408, lng: 113.620, type: 'food', day: [2], desc: '<b>5.2 午饭</b> ¥80-100<br>焖鹅、泥煨鸡<br>孩子能院子里跑' },
+  { id: 'nanmang', name: '南芒湾（赶海点）', lat: 22.380, lng: 113.620, type: 'attraction', day: [2], desc: '<b>5.2 14:30–17:30</b><br>潮位 0.3m 三天最低<br>礁石生蚝 + 招潮蟹' },
+  { id: 'dieshi', name: '叠石酒家（唐家总店）', lat: 22.358, lng: 113.567, type: 'food', day: [2], desc: '<b>5.2 晚饭</b> ¥126<br>椒盐濑尿虾、滴津烧鹅' },
+  { id: 'yuanming', name: '圆明新园', lat: 22.282, lng: 113.546, type: 'attraction', day: [3], desc: '<b>5.3 10:00–12:00</b><br>免费 · 中心剧场室内表演<br>《乾隆号》游船 ¥39' },
+  { id: 'caifenglou', name: '仁恒洲际·彩丰楼', lat: 22.255, lng: 113.585, type: 'food', day: [3], desc: '<b>5.3 午饭送行宴</b> ¥230<br>海景包房<br>电话 0756-8889999' },
+  { id: 'haibing', name: '情侣路海滨公园', lat: 22.281, lng: 113.585, type: 'attraction', day: [3], desc: '<b>5.3 14:00 车上巡游</b><br>长椅 + 公厕齐全' },
+  { id: 'xianglu', name: '香炉湾沙滩', lat: 22.276, lng: 113.587, type: 'attraction', day: [3], desc: '<b>5.3 14:10 车上巡游</b><br>市区人造沙滩 · 严禁下水' },
+  { id: 'riyuebei', name: '日月贝（珠海大剧院）', lat: 22.260, lng: 113.595, type: 'attraction', day: [3], desc: '<b>5.3 14:20 拍照</b><br>珠海地标' },
+  { id: 'haiquan', name: '海泉湾温泉（Plan B）', lat: 21.927, lng: 113.293, type: 'planb', day: [2], desc: '5.2 雷雨备选<br>距酒店 25 km' },
+  { id: 'jinsha', name: '金海滩（备用）', lat: 22.005, lng: 113.428, type: 'planb', day: [2], desc: '免费 · 距酒店 10 km' },
+];
+
+const ROUTES = {
+  1: ['station', 'gantang', 'gongbei', 'jinyuexuan', 'erjingwan', 'redapple', 'hotel'],
+  2: ['hotel', 'qiao_bridge', 'qiao_red', 'baishi', 'suzhaozheng', 'dongao', 'jiayuan', 'nanmang', 'dieshi', 'hotel'],
+  3: ['hotel', 'yuanming', 'caifenglou', 'haibing', 'xianglu', 'riyuebei', 'station']
+};
+
+const DAY_COLORS = { 1: '#0284c7', 2: '#059669', 3: '#d97706' };
+const TYPE_COLORS = { transit: '#334155', hotel: '#e11d48', attraction: '#0284c7', food: '#f59e0b', planb: '#94a3b8' };
+
+const map = L.map('leaflet-map', { zoomControl: true }).setView([22.21, 113.54], 11);
+
+L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+  subdomains: '1234',
+  maxZoom: 18,
+  attribution: '© AutoNavi'
+}).addTo(map);
+
+const markersLayer = L.layerGroup().addTo(map);
+const routeLayers = { 1: L.layerGroup(), 2: L.layerGroup(), 3: L.layerGroup() };
+
+function buildMarker(poi) {
+  const color = TYPE_COLORS[poi.type] || '#0284c7';
+  const icon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div style="background:' + color + ';width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 2px ' + color + '80;"></div>',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+  return L.marker([poi.lat, poi.lng], { icon })
+    .bindPopup('<b>' + poi.name + '</b><br><span style="color:#64748b;">' + poi.desc + '</span>');
+}
+
+function renderMarkers(dayFilter) {
+  markersLayer.clearLayers();
+  POIS.forEach(function (poi) {
+    if (dayFilter === 'all' || poi.day.indexOf(dayFilter) !== -1) {
+      buildMarker(poi).addTo(markersLayer);
+    }
+  });
+}
+
+function renderRoutes(dayFilter) {
+  Object.keys(routeLayers).forEach(function (k) { map.removeLayer(routeLayers[k]); });
+  const days = dayFilter === 'all' ? [1, 2, 3] : [dayFilter];
+  days.forEach(function (d) {
+    routeLayers[d].clearLayers();
+    const points = ROUTES[d].map(function (id) {
+      const p = POIS.find(function (x) { return x.id === id; });
+      return [p.lat, p.lng];
+    });
+    L.polyline(points, {
+      color: DAY_COLORS[d],
+      weight: 4,
+      opacity: 0.75
+    }).addTo(routeLayers[d]);
+    routeLayers[d].addTo(map);
+  });
+}
+
+function toggleDay(day) {
+  document.querySelectorAll('.day-btn').forEach(function (btn) {
+    if (String(btn.dataset.day) === String(day)) {
+      btn.classList.add('bg-slate-800', 'text-white');
+      btn.classList.remove('bg-slate-100');
+    } else {
+      btn.classList.remove('bg-slate-800', 'text-white');
+      btn.classList.add('bg-slate-100');
+    }
+  });
+  const filter = day === 'all' ? 'all' : Number(day);
+  renderMarkers(filter);
+  renderRoutes(filter);
+}
+
+renderMarkers('all');
+renderRoutes('all');
+
+// 清单 localStorage
+const STORAGE_KEY = 'zhuhai_trip_checks_v2';
+function saveChecks() {
+  const state = {};
+  document.querySelectorAll('.check-item input[type=checkbox]').forEach(function (cb, i) {
+    state[i] = cb.checked;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadChecks() {
+  try {
+    const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    document.querySelectorAll('.check-item input[type=checkbox]').forEach(function (cb, i) {
+      cb.checked = !!state[i];
+      cb.closest('.check-item').classList.toggle('checked', cb.checked);
+    });
+  } catch (e) {}
+}
+document.querySelectorAll('.check-item input[type=checkbox]').forEach(function (cb) {
+  cb.addEventListener('change', function () {
+    cb.closest('.check-item').classList.toggle('checked', cb.checked);
+    saveChecks();
+  });
+});
+loadChecks();
+</script>
+</body>
+</html>
